@@ -8,6 +8,7 @@ export default function ReceiptGenerator() {
   const [issuedTo, setIssuedTo] = useState("");
   const [items, setItems] = useState([{ description: "", qty: 1, price: 0 }]);
   const recipients = useSelector((state) => state.recipients.list);
+  const products = useSelector((state) => state.items.list);
   const [showPreview, setShowPreview] = useState(false)
 
   const handleItemChange = (index, field, value) => {
@@ -52,13 +53,20 @@ export default function ReceiptGenerator() {
         </select>
         {items.map((item, idx) => (
           <div key={idx} className="flex gap-2 w-full">
-            <input
+            <select className="capitalize border" placeholder={'Item'} name="item" value={item.description} onChange={(e) => handleItemChange(idx, "description", e.target.value)} id="">
+              {products.map((r, idx) => (
+                <option key={idx} className="p-2 border capitalize rounded flex justify-between">
+                  {r}
+                </option>
+              ))}
+            </select>
+            {/* <input
               type="text"
               placeholder="Description"
               value={item.description}
               onChange={(e) => handleItemChange(idx, "description", e.target.value)}
               className="flex-1 w-[50%] border p-2 rounded"
-            />
+            /> */}
             <input
               type="number"
               min="1"
@@ -90,7 +98,7 @@ export default function ReceiptGenerator() {
 
       {/* Receipt Preview */}
       <ReceiptModal
-        isOpen={showPreview} onClose={() => setShowPreview(false)}  date={date} issuedTo={issuedTo} items={items} grandTotal={grandTotal}
+        isOpen={showPreview} onClose={() => setShowPreview(false)} date={date} issuedTo={issuedTo} items={items} grandTotal={grandTotal}
       />
     </div>
   );

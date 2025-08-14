@@ -2,6 +2,7 @@ import React from "react";
 import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
 import ReceiptGenerator from "../pages/receiptgenerator/ReceiptGenerator";
 import RecipientsPage from "../pages/recipients/RecipientsPage";
+import ItemsPage from "../pages/items/Items";
 
 export default function RootRoutes() {
     return (
@@ -18,6 +19,9 @@ export default function RootRoutes() {
                         <Link to="/recipients" className="text-blue-600 hover:underline">
                             Recipients
                         </Link>
+                        <Link to="/items" className="text-blue-600 hover:underline">
+                            Items
+                        </Link>
                         <Link to="/receipt" className="text-blue-600 hover:underline">
                             Generate
                         </Link>
@@ -29,6 +33,7 @@ export default function RootRoutes() {
                 <div className="p-4">
                     <Routes>
                         <Route path="/recipients" element={<RecipientsPage />} />
+                        <Route path="/items" element={<ItemsPage />} />
                         <Route path="/receipt" element={<ReceiptGenerator />} />
                         <Route path="*" element={<RecipientsPage />} /> {/* Default route */}
                     </Routes>
