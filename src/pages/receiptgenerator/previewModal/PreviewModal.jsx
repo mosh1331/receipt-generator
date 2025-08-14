@@ -34,8 +34,8 @@ export default function ReceiptModal({ isOpen, onClose, date, issuedTo, items, g
             <h1 className="text-2xl font-bold uppercase">Agencies</h1>
 
             <div className="flex justify-between mt-2 text-[8px]">
-              <span>Date Issued: {date}</span>
               <span>Issued to: {issuedTo}</span>
+              <span>Date Issued: {date}</span>
             </div>
           </div>
 
