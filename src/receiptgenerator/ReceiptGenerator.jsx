@@ -1,8 +1,8 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import html2canvas from "html2canvas";
 
 export default function ReceiptGenerator() {
-  const [date, setDate] = useState("");
+  const [date, setDate] = useState();
   const [issuedTo, setIssuedTo] = useState("");
   const [items, setItems] = useState([{ description: "", qty: 1, price: 0 }]);
   const receiptRef = useRef(null);
@@ -36,6 +36,10 @@ export default function ReceiptGenerator() {
     }
   };
 
+  useEffect(()=>{
+    setDate(JSON.stringify(new Date()))
+  },[])
+
   return (
     <div className="p-4 max-w-md mx-auto space-y-6">
       {/* Form */}
@@ -67,14 +71,14 @@ export default function ReceiptGenerator() {
               min="1"
               value={item.qty}
               onChange={(e) => handleItemChange(idx, "qty", e.target.value)}
-              className="w-16 border p-2 rounded"
+              className="w-12 border p-2 rounded"
             />
             <input
               type="number"
               min="0"
               value={item.price}
               onChange={(e) => handleItemChange(idx, "price", e.target.value)}
-              className="w-20 border p-2 rounded"
+              className="w-12 border p-2 rounded"
             />
           </div>
         ))}
@@ -98,16 +102,18 @@ export default function ReceiptGenerator() {
         <div className="absolute bottom-0 left-0 w-24 h-24 bg-pink-300 rotate-45 -translate-x-12 translate-y-12"></div>
 
         {/* Header */}
-        <div className="relative z-10 text-center">
-          <h1 className="text-2xl font-bold">POLAR AGENCIES</h1>
-          <div className="flex justify-between mt-2 text-sm">
+        <div className="relative z-10 text-left mb-20">
+          <h1 className="text-2xl font-bold">POLAR </h1>
+          <h1 className="text-2xl font-bold uppercase">Agencies </h1>
+          
+          <div className="flex justify-between mt-2 text-[8px]">
             <span>Date Issued: {date}</span>
             <span>Issued to: {issuedTo}</span>
           </div>
         </div>
 
         {/* Table */}
-        <table className="w-full mt-6 text-sm relative z-10 border-t border-b border-gray-300">
+        <table className="w-full mt-6 text-[10px] relative z-10 border-t border-b border-gray-300">
           <thead>
             <tr className="border-b">
               <th className="text-left py-2">Description</th>
@@ -119,7 +125,7 @@ export default function ReceiptGenerator() {
           <tbody>
             {items.map((item, idx) => (
               <tr key={idx} className="border-b">
-                <td className="py-2">{item.description}</td>
+                <td className="py-2 border-">{item.description}</td>
                 <td className="text-center">{item.qty}</td>
                 <td className="text-center">₹{item.price}</td>
                 <td className="text-center">₹{item.qty * item.price}</td>
@@ -129,8 +135,8 @@ export default function ReceiptGenerator() {
         </table>
 
         {/* Total */}
-        <div className="flex justify-between mt-4 font-bold relative z-10">
-          <span>GRAND TOTAL</span>
+        <div className="flex justify-end gap-4 mt-4 text-[12px] font-bold relative z-10 mb-20">
+          <span>GRAND TOTAL : </span>
           <span>₹{grandTotal}</span>
         </div>
       </div>
