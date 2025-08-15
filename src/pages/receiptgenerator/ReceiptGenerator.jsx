@@ -2,11 +2,12 @@ import React, { useState, useRef, useEffect } from "react";
 import html2canvas from "html2canvas";
 import { useSelector } from "react-redux";
 import ReceiptModal from "./previewModal/PreviewModal";
+import dayjs from "dayjs";
 
 export default function ReceiptGenerator() {
   const [date, setDate] = useState();
   const [issuedTo, setIssuedTo] = useState("");
-  const [items, setItems] = useState([{ description: "", qty: 1, price: 0 }]);
+  const [items, setItems] = useState([]);
   const recipients = useSelector((state) => state.recipients.list);
   const products = useSelector((state) => state.items.list);
   const [showPreview, setShowPreview] = useState(false)
@@ -29,9 +30,15 @@ export default function ReceiptGenerator() {
 
   const grandTotal = items.reduce((sum, item) => sum + item.qty * item.price, 0);
 
-
+//set initial data
   useEffect(() => {
-    setDate(JSON.stringify(new Date()))
+    const initalProduct= products.length > 0 ?  products[0] :''
+    const initalReceivee= recipients.length > 0 ?  recipients[0] :''
+    
+    setDate(dayjs().format("YYYY-MM-DD"))
+    setItems([{ description: initalProduct, qty: 1, price: 0 }])
+    setIssuedTo(initalReceivee)
+    
   }, [])
 
   return (
@@ -41,7 +48,10 @@ export default function ReceiptGenerator() {
         <input
           type="date"
           value={date}
-          onChange={(e) => setDate(e.target.value)}
+          onChange={(e) => {
+            console.log(e.target.value,'date')
+            setDate(e.target.value)
+          }}
           className="w-full border p-2 rounded"
         />
         <select className="capitalize border" name="" value={issuedTo} onChange={(e) => setIssuedTo(e.target.value)} id="">

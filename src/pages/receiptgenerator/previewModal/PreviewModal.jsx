@@ -57,7 +57,7 @@ export default function ReceiptModal({ isOpen, onClose, date, issuedTo, items, g
                         <h1 className="text-2xl font-bold uppercase">Agencies</h1>
 
                         <div className="flex justify-between mt-2 text-[8px]">
-                            <span>Issued to: {issuedTo}</span>
+                            <span className="capitalize">Issued to: {issuedTo}</span>
                             <span>Date Issued: {date}</span>
                         </div>
                     </div>
@@ -75,7 +75,7 @@ export default function ReceiptModal({ isOpen, onClose, date, issuedTo, items, g
                         <tbody>
                             {items.map((item, idx) => (
                                 <tr key={idx} className="border-b">
-                                    <td className="py-2">{item.description}</td>
+                                    <td className="py-2 capitalize">{item.description}</td>
                                     <td className="text-center">{item.qty}</td>
                                     <td className="text-center">₹{item.price}</td>
                                     <td className="text-center">₹{item.qty * item.price}</td>
