@@ -1,8 +1,11 @@
+import dayjs from "dayjs";
 import html2canvas from "html2canvas";
-import React, { useRef } from "react";
+import React, { useRef, useState } from "react";
 
 export default function ReceiptModal({ isOpen, onClose, date, issuedTo, items, grandTotal }) {
     const receiptRef = useRef(null);
+    const [showAmountInput, setShowAmountInput] = useState(false)
+    const [receivedAmount, setReceivedAmount] = useState(0)
 
     const generateImage = () => {
         if (receiptRef.current) {
@@ -58,7 +61,7 @@ export default function ReceiptModal({ isOpen, onClose, date, issuedTo, items, g
 
                         <div className="flex justify-between mt-2 text-[8px]">
                             <span className="capitalize">Issued to: {issuedTo}</span>
-                            <span>Date Issued: {date}</span>
+                            <span>Date Issued: {dayjs(date).format("MM-DD-YYYY")}</span>
                         </div>
                     </div>
 
@@ -85,10 +88,28 @@ export default function ReceiptModal({ isOpen, onClose, date, issuedTo, items, g
                     </table>
 
                     {/* Total */}
-                    <div className="flex justify-end gap-4 mt-4 text-[12px] font-bold relative z-10 mb-20">
-                        <span>GRAND TOTAL :</span>
-                        <span>₹{grandTotal}</span>
+                    <div className="mb-20">
+                        <div className="flex justify-end gap-4 mt-4 text-[12px] font-bold relative z-10 ">
+                            <span>GRAND TOTAL :</span>
+                            <span>₹{grandTotal}</span>
+                        </div>
+
+                        {receivedAmount ?
+                            <table className="w-full mt-6 text-[10px] relative z-10 border-t border-b border-gray-300">
+
+                                <tbody>
+                                    <tr className="border-b">
+                                        <td className="py-2 capitalize">Received amount</td>
+                                        <td className="text-center">₹{receivedAmount}</td>
+                                    </tr>
+                                    <tr className="border-b">
+                                        <td className="py-2 capitalize font-bold">Balance amount</td>
+                                        <td className="text-center font-bold">₹{grandTotal - receivedAmount}</td>
+                                    </tr>
+                                </tbody>
+                            </table> : null}
                     </div>
+
                 </div>
                 <div className="flex w-full ">
                     <button
@@ -100,6 +121,30 @@ export default function ReceiptModal({ isOpen, onClose, date, issuedTo, items, g
                     <button onClick={shareReceipt} className="bg-green-500 w-1/2  text-white px-4 py-2  flex-1">
                         Share
                     </button>
+                </div>
+                <div className=" w-full ">
+                    <button onClick={setShowAmountInput} className="bg-gray-500 w-full  text-white px-4 py-2  flex-1">
+                        Add Received amount
+                    </button>
+                    {showAmountInput ? <div className="relative w-full">
+                        <input
+                            type="number"
+                            min="1"
+                            value={receivedAmount}
+                            onChange={(e) => setReceivedAmount(e.target.value)}
+                            className="w-full border p-2 rounded pr-8" // add right padding so 'x' doesn't overlap text
+                        />
+                        <button
+                            type="button"
+                            onClick={() => {
+                                setReceivedAmount(0)
+                                setShowAmountInput(false)
+                            }}
+                            className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 hover:text-black"
+                        >
+                            ✕
+                        </button>
+                    </div> : null}
                 </div>
             </div>
         </div>

@@ -34,11 +34,9 @@ export default function ReceiptGenerator() {
   useEffect(() => {
     const initalProduct= products.length > 0 ?  products[0] :''
     const initalReceivee= recipients.length > 0 ?  recipients[0] :''
-    
     setDate(dayjs().format("YYYY-MM-DD"))
     setItems([{ description: initalProduct, qty: 1, price: 0 }])
     setIssuedTo(initalReceivee)
-    
   }, [])
 
   return (
@@ -70,13 +68,6 @@ export default function ReceiptGenerator() {
                 </option>
               ))}
             </select>
-            {/* <input
-              type="text"
-              placeholder="Description"
-              value={item.description}
-              onChange={(e) => handleItemChange(idx, "description", e.target.value)}
-              className="flex-1 w-[50%] border p-2 rounded"
-            /> */}
             <input
               type="number"
               min="1"
