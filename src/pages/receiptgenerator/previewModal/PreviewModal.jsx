@@ -61,7 +61,7 @@ export default function ReceiptModal({ isOpen, onClose, date, issuedTo, items, g
 
                         <div className="flex justify-between mt-2 text-[8px]">
                             <span className="capitalize">Issued to: {issuedTo}</span>
-                            <span>Date Issued: {dayjs(date).format("MM-DD-YYYY")}</span>
+                            <span>Date Issued: {dayjs(date).format("DD-MM-YYYY")}</span>
                         </div>
                     </div>
 
