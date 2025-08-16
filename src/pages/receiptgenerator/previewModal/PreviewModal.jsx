@@ -81,7 +81,7 @@ export default function ReceiptModal({ isOpen, onClose, date, issuedTo, items, g
                                     <td className="py-2 capitalize">{item.description}</td>
                                     <td className="text-center">{item.qty}</td>
                                     <td className="text-center">₹{item.discountedPrice ? item.discountedPrice : item.price}</td>
-                                    <td className="text-center">₹{item.qty * item.price}</td>
+                                    <td className="text-center">₹{item.discountedPrice ? item.qty * item.discountedPrice:item.qty * item.price}</td>
                                 </tr>
                             ))}
                         </tbody>
