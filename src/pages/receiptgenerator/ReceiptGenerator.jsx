@@ -45,7 +45,7 @@ export default function ReceiptGenerator() {
     setShowDiscountInput(false)
   }
 
-  const grandTotal = items.reduce((sum, item) => sum + item.qty * item.price, 0);
+  const grandTotal = items.reduce((sum, item) => sum + item.qty * item?.discountedPrice ? item?.discountedPrice :item.price, 0);
 
   //set initial data
   useEffect(() => {
