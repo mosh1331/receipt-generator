@@ -1,11 +1,13 @@
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { addRecipient,removeRecipient, resetRecipients } from "../../redux/slice/recipientsSlice";
+import { addRecipient, removeRecipient, resetRecipients } from "../../redux/slice/recipientsSlice";
+import ConfirmModal from "../../common/confirmmodal/ConfirmModal";
 
 export default function RecipientsPage() {
   const dispatch = useDispatch();
   const recipients = useSelector((state) => state.recipients.list);
   const [name, setName] = useState("");
+  const [open, setOpen] = useState(false);
 
   const handleAdd = () => {
     if (!name.trim()) return;
@@ -46,12 +48,21 @@ export default function RecipientsPage() {
       </ul>
       {recipients.length > 0 && (
         <button
-          onClick={() => dispatch(resetRecipients())}
+          onClick={() => setOpen(true)}
           className="mt-4 bg-gray-500 text-white px-4 py-2 rounded w-full"
         >
           Reset All
         </button>
       )}
+      <ConfirmModal
+        isOpen={open}
+        message="Do you really want to reset everything?"
+        onConfirm={() => {
+          setOpen(false)
+          dispatch(resetRecipients())
+        }}
+        onCancel={() => setOpen(false)}
+      />
     </div>
   );
 }

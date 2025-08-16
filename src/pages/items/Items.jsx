@@ -1,17 +1,19 @@
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { addItem, removeItem, resetItems } from "../../redux/slice/itemsSlice";
+import ConfirmModal from "../../common/confirmmodal/ConfirmModal";
 
 export default function ItemsPage() {
     const dispatch = useDispatch();
     const items = useSelector((state) => state.items.list);
     const [name, setName] = useState("");
     const [price, setPrice] = useState(0);
+    const [open, setOpen] = useState(false);
 
     const handleAdd = () => {
         if (!name.trim() || price === 0) return;
         const id = `${name}-${price}`
-        dispatch(addItem({id,name,price}));
+        dispatch(addItem({ id, name, price }));
         setName("");
         setPrice(0);
     };
@@ -47,7 +49,7 @@ export default function ItemsPage() {
                 {items.map((r, idx) => (
                     <li key={idx} className="p-2 border  capitalize rounded flex justify-between">
                         {r.name} -  ₹{r.price}
-                      
+
                         <button
                             onClick={() => dispatch(removeItem(idx))}
                             className="text-red-500"
@@ -59,12 +61,21 @@ export default function ItemsPage() {
             </ul>
             {items.length > 0 && (
                 <button
-                    onClick={() => dispatch(resetItems())}
+                    onClick={()=>setOpen(true) }
                     className="mt-4 bg-gray-500 text-white px-4 py-2 rounded w-full"
                 >
                     Reset All
                 </button>
             )}
+            <ConfirmModal
+                isOpen={open}
+                message="Do you really want to reset everything?"
+                onConfirm={() => {
+                    setOpen(false)
+                    dispatch(resetItems())
+                }}
+                onCancel={() => setOpen(false)}
+            />
         </div>
     );
 }

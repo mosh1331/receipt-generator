@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
 import ReceiptGenerator from "../pages/receiptgenerator/ReceiptGenerator";
 import RecipientsPage from "../pages/recipients/RecipientsPage";
 import ItemsPage from "../pages/items/Items";
+import Pending from "../pages/pending/Pending";
 
 export default function RootRoutes() {
     return (
@@ -12,10 +13,10 @@ export default function RootRoutes() {
                 {/* <header className="md-hidden p-2">
                     <h1 className="hidden md:block font-bold text-lg mr-6">Polar Agencies</h1>
                 </header> */}
-                <nav className="bg-white shadow p-4 flex justify-between md:justify-center fixed bottom-0 md:static w-full md:w-auto z-50">
-                    <h1 className="hidden md:block font-bold text-lg mr-6">Polar Agencies</h1>
-
-                    <div className="flex gap-6 justify-around w-full md:w-auto">
+                {/* Desktop Nav */}
+                <nav className="hidden md:flex bg-white shadow p-4 justify-center w-full z-50">
+                    <h1 className="font-bold text-lg mr-6">Polar Agencies</h1>
+                    <div className="flex gap-6">
                         <Link to="/recipients" className="text-blue-600 hover:underline">
                             Recipients
                         </Link>
@@ -25,8 +26,48 @@ export default function RootRoutes() {
                         <Link to="/receipt" className="text-blue-600 hover:underline">
                             Generate
                         </Link>
+                        <Link to="/pending" className="text-blue-600 hover:underline">
+                            Pending
+                        </Link>
                     </div>
                 </nav>
+
+                {/* Mobile Bottom Nav */}
+                <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white shadow-lg flex justify-between items-center px-6 py-2 z-50">
+                    {/* Left links */}
+                    <Link to="/recipients" className="flex flex-col items-center text-xs text-gray-600">
+                        👤
+                        <span>Recipients</span>
+                    </Link>
+
+                  
+
+                    {/* Floating Button */}
+                    <div className="relative -top-6">
+                        <Link
+                            to="/receipt"
+                            className="w-14 h-14 rounded-full bg-blue-600 text-white flex items-center justify-center shadow-lg text-xl"
+                        >
+                            ➕
+                        </Link>
+                    </div>
+
+                    <Link to="/items" className="flex flex-col items-center text-xs text-gray-600">
+                        📦
+                        <span>Items</span>
+                    </Link>
+
+                    {/* <Link to="/pending" className="flex flex-col items-center text-xs text-gray-600">
+                        ⏳
+                        <span>Pending</span>
+                    </Link>
+
+                    <Link to="/profile" className="flex flex-col items-center text-xs text-gray-600">
+                        ⚙️
+                        <span>Profile</span>
+                    </Link> */}
+                </nav>
+
 
 
                 {/* Pages */}
@@ -35,6 +76,7 @@ export default function RootRoutes() {
                         <Route path="/recipients" element={<RecipientsPage />} />
                         <Route path="/items" element={<ItemsPage />} />
                         <Route path="/receipt" element={<ReceiptGenerator />} />
+                        <Route path="/pending" element={<Pending />} />
                         <Route path="*" element={<RecipientsPage />} /> {/* Default route */}
                     </Routes>
                 </div>
