@@ -1,11 +1,14 @@
 import dayjs from "dayjs";
 import html2canvas from "html2canvas";
 import React, { useRef, useState } from "react";
+import { useDispatch } from "react-redux";
+import { addPendingBill } from "../../../redux/slice/pendingBillsSlice";
 
 export default function ReceiptModal({ isOpen, onClose, date, issuedTo, items, grandTotal }) {
     const receiptRef = useRef(null);
     const [showAmountInput, setShowAmountInput] = useState(false)
     const [receivedAmount, setReceivedAmount] = useState(0)
+    const dispatch = useDispatch()
 
     const generateImage = () => {
         if (receiptRef.current) {
@@ -17,6 +20,36 @@ export default function ReceiptModal({ isOpen, onClose, date, issuedTo, items, g
             });
         }
     };
+
+    const addBillAsPending = () => {
+        const item={
+            id:dayjs().format("DD-MM-YYYY hh:mm:ss"),
+            date:dayjs().format("DD-MM-YYYY hh:mm A"),
+            customer:issuedTo,
+            items,
+            total:grandTotal,
+            receivedAmount:receivedAmount,
+            balance:grandTotal - receivedAmount
+        }
+        dispatch(addPendingBill(item))
+        shareReceipt()
+    }
+
+    const checkWhetherUnpaid = () => {
+        //received some amount
+        if (receivedAmount > 0) {
+            //if total amount recieved less than grand total
+            if (grandTotal < receivedAmount) {
+                addBillAsPending()
+            } else {
+                //if received amount same or greater than grand total
+                shareReceipt()
+            }
+        } else {
+            addBillAsPending()
+        }
+
+    }
 
     const shareReceipt = async () => {
         if (navigator.share && navigator.canShare) {
@@ -79,9 +112,9 @@ export default function ReceiptModal({ isOpen, onClose, date, issuedTo, items, g
                             {items.map((item, idx) => (
                                 <tr key={idx} className="border-b">
                                     <td className="py-2 capitalize">{item.description}</td>
-                                    <td className="text-center">{item.qty}</td>
-                                    <td className="text-center">₹{item.discountedPrice ? item.discountedPrice : item.price}</td>
-                                    <td className="text-center">₹{item.discountedPrice ? item.qty * item.discountedPrice:item.qty * item.price}</td>
+                                    <td className="text-center">{item.isPending ?'': item.qty}</td>
+                                   {item.isPending ? <td></td> : <td className="text-center">₹{item.discountedPrice ? item.discountedPrice : item.price}</td>}
+                                    <td className="text-center">₹{item.discountedPrice ? item.qty * item.discountedPrice : item.qty * item.price}</td>
                                 </tr>
                             ))}
                         </tbody>
@@ -118,7 +151,7 @@ export default function ReceiptModal({ isOpen, onClose, date, issuedTo, items, g
                     >
                         Cancel
                     </button>
-                    <button onClick={shareReceipt} className="bg-green-500 w-1/2  text-white px-4 py-2  flex-1">
+                    <button onClick={checkWhetherUnpaid} className="bg-green-500 w-1/2  text-white px-4 py-2  flex-1">
                         Share
                     </button>
                 </div>

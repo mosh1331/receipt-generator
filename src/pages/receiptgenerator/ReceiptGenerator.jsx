@@ -6,6 +6,8 @@ import dayjs from "dayjs";
 import DiscountInputModal from "./discounInputModal/DiscountInputModal";
 import PriceField from "./priceField/PriceField";
 import ConfirmModal from "../../common/confirmmodal/ConfirmModal";
+import { useLocation } from "react-router-dom";
+import { isPending } from "@reduxjs/toolkit";
 
 export default function ReceiptGenerator() {
   const [date, setDate] = useState();
@@ -18,6 +20,13 @@ export default function ReceiptGenerator() {
 
   const recipients = useSelector((state) => state.recipients.list);
   const products = useSelector((state) => state.items.list);
+  const bills = useSelector((state) => state.pending.list);
+
+  const location = useLocation()
+  const pendingBillItem = location.state
+
+  //if coming from pending add default item 'old balance' '
+
 
   const handleItemChange = (index, field, value) => {
     const updated = [...items];
@@ -26,7 +35,7 @@ export default function ReceiptGenerator() {
   };
 
   const addItem = () => {
-    setItems([...items, { description: "", qty: 1, price: 0 }]);
+    setItems([...items, { description: "", qty: 1, price: 0}]);
   };
 
   const resetForm = () => {
@@ -45,7 +54,7 @@ export default function ReceiptGenerator() {
     setShowDiscountInput(false)
   }
 
-  const grandTotal = items.reduce((sum, item) => sum + item.qty * (item?.discountedPrice ? item?.discountedPrice :item.price), 0);
+  const grandTotal = items.reduce((sum, item) => sum + item.qty * (item?.discountedPrice ? item?.discountedPrice : item.price), 0);
 
   //set initial data
   useEffect(() => {
@@ -57,12 +66,27 @@ export default function ReceiptGenerator() {
     setIssuedTo(initalReceivee)
   }, [])
 
+  useEffect(() => {
+    if (pendingBillItem?.id) {
+      const pendingItem = {
+        description: 'Old balance',
+        price: pendingBillItem?.balance,
+        qty: 1,
+        isPending: true,
+        date:pendingBillItem?.date
+
+      }
+      setItems(prev => [...prev, pendingItem])
+    }
+  }, [pendingBillItem])
+
+
   console.log(items, 'items')
 
   return (
     <div className="p-2 max-w-md mx-auto space-y-6">
       {/* Form */}
-      <div className="space-y-3 py-6 bg-white p-4 rounded-xl shadow">
+      <div className="space-y-3 py-6 bg-white p-4 rounded-xl shadow pb-24">
         <input
           type="date"
           value={date}
@@ -82,10 +106,13 @@ export default function ReceiptGenerator() {
         {items.map((item, idx) => (
           <div
             key={idx}
-            className="bg-white shadow rounded-xl p-4 mb-4 flex flex-col gap-2 relative"
+            className={`${item?.isPending ? 'bg-gray-100' : 'bg-white'}  shadow rounded-xl p-4  mb-4 flex flex-col gap-2 relative`}
           >
             {/* Select Product */}
-            <select
+          {item?.isPending ? <div className="flex gap-2 items-center">
+            <p className="">{item.description}</p>
+            <p className="bg-gray-200 rounded text-[10px] p-1 font-bold">{item.date}</p>
+          </div>:  <select
               className="capitalize border p-2 rounded w-full"
               name="item"
               value={item.id}
@@ -102,9 +129,14 @@ export default function ReceiptGenerator() {
                   {r.name}
                 </option>
               ))}
-            </select>
+            </select>}
 
             {/* Quantity + Price Row */}
+            {item?.isPending ? 
+            <div className="flex">
+              <p className="text-lg font-semibold text-[tomato]">₹{item?.price}</p>
+            </div>
+            :
             <div className="flex items-center justify-between gap-2">
               {/* Qty with increment/decrement */}
               <div className="flex items-center border rounded-lg w-[60%]">
@@ -153,7 +185,7 @@ export default function ReceiptGenerator() {
                   + Discount
                 </button>}
               </div>
-            </div>
+            </div>}
 
 
           </div>
@@ -163,7 +195,7 @@ export default function ReceiptGenerator() {
           + Add Item
         </button>
         <div className="flex gap-2">
-          <button onClick={()=>setOpen(true)} className="bg-gray-500 text-white px-4 py-2 rounded flex-1">
+          <button onClick={() => setOpen(true)} className="bg-gray-500 text-white px-4 py-2 rounded flex-1">
             Reset
           </button>
           <button onClick={() => setShowPreview(true)} className="bg-green-500 text-white px-4 py-2 rounded flex-1">
@@ -183,10 +215,10 @@ export default function ReceiptGenerator() {
       <ReceiptModal
         isOpen={showPreview} onClose={() => setShowPreview(false)} date={date} issuedTo={issuedTo} items={items} grandTotal={grandTotal}
       />
-        <ConfirmModal
+      <ConfirmModal
         isOpen={open}
         message="Do you really want to reset everything?"
-        onConfirm={()=>{
+        onConfirm={() => {
           setOpen(false)
           resetForm()
         }}

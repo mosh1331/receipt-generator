@@ -57,15 +57,15 @@ export default function RootRoutes() {
                         <span>Items</span>
                     </Link>
 
-                    {/* <Link to="/pending" className="flex flex-col items-center text-xs text-gray-600">
+                    <Link to="/pending" className="flex flex-col items-center text-xs text-gray-600">
                         ⏳
                         <span>Pending</span>
                     </Link>
-
+{/* 
                     <Link to="/profile" className="flex flex-col items-center text-xs text-gray-600">
                         ⚙️
                         <span>Profile</span>
-                    </Link> */}
+                    </Link>  */}
                 </nav>
 
 

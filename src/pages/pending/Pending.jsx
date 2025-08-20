@@ -1,19 +1,42 @@
-import React from 'react'
+import React, { useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux';
+import PendingBillCard from './PendingBillCard';
+import { useNavigate } from 'react-router-dom';
+import ConfirmModal from '../../common/confirmmodal/ConfirmModal';
+import { removePendingBill } from '../../redux/slice/pendingBillsSlice';
 
 const Pending = () => {
-  return (
-    <div>
-        <div className="flex mb-2 border p-4">
-            <p className="font-bold">fill fill cafe - pending ₹220</p>
+    const bills = useSelector((state) => state.pending.list);
+    const [selected, setSelected] = useState(null)
+    const navigate = useNavigate()
+    const dispatch = useDispatch()
+
+    const onAddAnotherBill = (billItem) => {
+        navigate('/receipt', { state: billItem })
+
+    }
+
+    const onRemove = (item) => {
+        setSelected(item)
+    }
+
+    console.log(bills, 'bills')
+
+
+    return (
+        <div>
+            {bills?.map(i => <PendingBillCard key={i.id} bill={i} onPay={() => onAddAnotherBill(i)} onRemove={() => onRemove(i)} />)}
+            <ConfirmModal
+                isOpen={!!selected}
+                message="Do you really want to delete this pending bill?"
+                onConfirm={() => {
+                    dispatch(removePendingBill(selected?.id))
+                    setSelected(null)
+                }}
+                onCancel={() =>  setSelected(null)}
+            />
         </div>
-        <div className="flex mb-2 border p-4">
-            <p className="font-bold">BEEGUM foods - Spending ₹420</p>
-        </div>
-        <div className="flex mb-2 border p-4">
-            <p className="font-bold">JALEEL FOODS - pending ₹500</p>
-        </div>
-    </div>
-  )
+    )
 }
 
 export default Pending
