@@ -73,10 +73,11 @@ export default function ReceiptGenerator() {
         price: pendingBillItem?.balance,
         qty: 1,
         isPending: true,
-        date:pendingBillItem?.date
+        date:pendingBillItem?.date,
 
       }
       setItems(prev => [...prev, pendingItem])
+      setIssuedTo(pendingBillItem?.customer)
     }
   }, [pendingBillItem])
 

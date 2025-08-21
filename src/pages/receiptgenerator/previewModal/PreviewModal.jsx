@@ -1,13 +1,15 @@
 import dayjs from "dayjs";
 import html2canvas from "html2canvas";
-import React, { useRef, useState } from "react";
-import { useDispatch } from "react-redux";
-import { addPendingBill } from "../../../redux/slice/pendingBillsSlice";
+import React, { useEffect, useRef, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { addPendingBill, removePendingBill, updatePendingBill } from "../../../redux/slice/pendingBillsSlice";
 
-export default function ReceiptModal({ isOpen, onClose, date, issuedTo, items, grandTotal }) {
+export default function ReceiptModal({ isOpen, onClose, date, issuedTo, items, grandTotal,partialReceived=0 }) {
     const receiptRef = useRef(null);
     const [showAmountInput, setShowAmountInput] = useState(false)
     const [receivedAmount, setReceivedAmount] = useState(0)
+    const pendingBills = useSelector((state) => state.pending.list);
+
     const dispatch = useDispatch()
 
     const generateImage = () => {
@@ -21,32 +23,47 @@ export default function ReceiptModal({ isOpen, onClose, date, issuedTo, items, g
         }
     };
 
-    const addBillAsPending = () => {
-        const item={
-            id:dayjs().format("DD-MM-YYYY hh:mm:ss"),
-            date:dayjs().format("DD-MM-YYYY hh:mm A"),
-            customer:issuedTo,
+    const addBillAsPending = (alreadyExistingBill) => {
+        const item = {
+            id: dayjs().format("DD-MM-YYYY hh:mm:ss"),
+            date: dayjs().format("DD-MM-YYYY hh:mm A"),
+            customer: issuedTo,
             items,
-            total:grandTotal,
-            receivedAmount:receivedAmount,
-            balance:grandTotal - receivedAmount
+            total: grandTotal,
+            receivedAmount: receivedAmount,
+            balance: grandTotal - receivedAmount
         }
-        dispatch(addPendingBill(item))
+        if (alreadyExistingBill) {
+            if (item.balance === 0) {dispatch(removePendingBill(alreadyExistingBill.id))}
+            else {
+                dispatch(updatePendingBill(item));
+            }
+
+        } else {
+            dispatch(addPendingBill(item))
+        }
+
         shareReceipt()
     }
 
     const checkWhetherUnpaid = () => {
+
+        const alreadyExistingBill = pendingBills?.find(i => i.customer === issuedTo)
         //received some amount
         if (receivedAmount > 0) {
             //if total amount recieved less than grand total
-            if (grandTotal < receivedAmount) {
-                addBillAsPending()
+            if (receivedAmount < grandTotal) {
+                addBillAsPending(alreadyExistingBill)
             } else {
                 //if received amount same or greater than grand total
-                shareReceipt()
+                if (alreadyExistingBill) {
+                    addBillAsPending(alreadyExistingBill)
+                } else {
+                    shareReceipt()
+                }
             }
         } else {
-            addBillAsPending()
+            addBillAsPending(alreadyExistingBill)
         }
 
     }
@@ -68,11 +85,20 @@ export default function ReceiptModal({ isOpen, onClose, date, issuedTo, items, g
                     //   alert("Your browser doesn't support direct file sharing.");
                 }
             });
+            setReceivedAmount(0)
+            setShowAmountInput(0)
+            onClose()
         } else {
             generateImage()
             //   alert("Sharing is not supported in this browser.");
         }
     };
+
+    useEffect(()=>{
+        if(partialReceived > 0){
+            setReceivedAmount(partialReceived)
+        }
+    },[partialReceived])
 
     if (!isOpen) return null;
 
@@ -112,8 +138,8 @@ export default function ReceiptModal({ isOpen, onClose, date, issuedTo, items, g
                             {items.map((item, idx) => (
                                 <tr key={idx} className="border-b">
                                     <td className="py-2 capitalize">{item.description}</td>
-                                    <td className="text-center">{item.isPending ?'': item.qty}</td>
-                                   {item.isPending ? <td></td> : <td className="text-center">₹{item.discountedPrice ? item.discountedPrice : item.price}</td>}
+                                    <td className="text-center">{item.isPending ? '' : item.qty}</td>
+                                    {item.isPending ? <td></td> : <td className="text-center">₹{item.discountedPrice ? item.discountedPrice : item.price}</td>}
                                     <td className="text-center">₹{item.discountedPrice ? item.qty * item.discountedPrice : item.qty * item.price}</td>
                                 </tr>
                             ))}

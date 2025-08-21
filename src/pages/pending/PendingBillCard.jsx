@@ -1,6 +1,6 @@
 import React from "react";
 
-const PendingBillCard = ({ bill, onPay, onRemove }) => {
+const PendingBillCard = ({ bill, onPay, onRemove,onAddAnotherBill }) => {
   return (
     <div className="bg-white rounded-xl shadow-md p-4 mb-4 border border-gray-200">
       {/* Header */}
@@ -61,8 +61,15 @@ const PendingBillCard = ({ bill, onPay, onRemove }) => {
           onClick={() => onPay(bill)}
           className="px-3 py-1 text-xs bg-green-500 text-white rounded-lg hover:bg-green-600"
         >
-          Pay Now
+          Received
         </button>
+        <button
+          onClick={() =>  onAddAnotherBill(bill)}
+          className="px-3 py-1 text-xs bg-gray-500 text-white rounded-lg hover:bg-green-600"
+        >
+          Add Another bill
+        </button>
+       
       </div>
     </div>
   );

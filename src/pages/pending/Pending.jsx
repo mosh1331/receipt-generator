@@ -4,10 +4,14 @@ import PendingBillCard from './PendingBillCard';
 import { useNavigate } from 'react-router-dom';
 import ConfirmModal from '../../common/confirmmodal/ConfirmModal';
 import { removePendingBill } from '../../redux/slice/pendingBillsSlice';
+import ReceiptModal from '../receiptgenerator/previewModal/PreviewModal';
 
 const Pending = () => {
     const bills = useSelector((state) => state.pending.list);
     const [selected, setSelected] = useState(null)
+    const [selectedBill, setSelectedBill] = useState(null)
+    const [showPreview, setShowPreview] = useState(false)
+
     const navigate = useNavigate()
     const dispatch = useDispatch()
 
@@ -16,16 +20,19 @@ const Pending = () => {
 
     }
 
+    const onMarkAsReceived = (billItem) => {
+        setSelectedBill(billItem)
+        setShowPreview(true)
+    }
+
     const onRemove = (item) => {
         setSelected(item)
     }
-
-    console.log(bills, 'bills')
-
+    console.log(selectedBill,'selectedBill')
 
     return (
         <div>
-            {bills?.map(i => <PendingBillCard key={i.id} bill={i} onPay={() => onAddAnotherBill(i)} onRemove={() => onRemove(i)} />)}
+            {bills?.map(i => <PendingBillCard key={i.id} bill={i} onAddAnotherBill={() => onAddAnotherBill(i)} onPay={() => onMarkAsReceived(i)} onRemove={() => onRemove(i)} />)}
             <ConfirmModal
                 isOpen={!!selected}
                 message="Do you really want to delete this pending bill?"
@@ -33,7 +40,16 @@ const Pending = () => {
                     dispatch(removePendingBill(selected?.id))
                     setSelected(null)
                 }}
-                onCancel={() =>  setSelected(null)}
+                onCancel={() => setSelected(null)}
+            />
+            <ReceiptModal
+                isOpen={showPreview}
+                onClose={() => setShowPreview(false)}
+                date={selectedBill?.date}
+                issuedTo={selectedBill?.customer}
+                items={selectedBill?.items}
+                grandTotal={selectedBill?.total}
+                partialReceived={selectedBill?.receivedAmount}
             />
         </div>
     )

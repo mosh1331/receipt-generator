@@ -10,17 +10,22 @@ const pendingBillsSlice = createSlice({
       // action.payload = { id, customer, items, total, receivedAmount }
       const { total, receivedAmount = 0 } = action.payload;
 
-      // case 1: no amount received
       if (receivedAmount === 0) {
         state.list.push({ ...action.payload, status: "unpaid", balance: total });
-      }
-      // case 2: partial payment
-      else if (receivedAmount < total) {
+      } else if (receivedAmount < total) {
         state.list.push({
           ...action.payload,
-          status: "partial",
-          balance: total - receivedAmount,
+          status: "partial"
         });
+      }
+    },
+
+    updatePendingBill: (state, action) => {
+      // action.payload = { id, ...updates }
+      const { id,customer, ...updates } = action.payload;
+      const index = state.list.findIndex((bill) => bill.customer === customer);
+      if (index !== -1) {
+        state.list[index] = { ...state.list[index], ...updates };
       }
     },
 
@@ -35,5 +40,11 @@ const pendingBillsSlice = createSlice({
   },
 });
 
-export const { addPendingBill, removePendingBill, clearPendingBills } = pendingBillsSlice.actions;
+export const {
+  addPendingBill,
+  updatePendingBill,
+  removePendingBill,
+  clearPendingBills,
+} = pendingBillsSlice.actions;
+
 export default pendingBillsSlice.reducer;
