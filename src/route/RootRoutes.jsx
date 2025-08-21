@@ -4,8 +4,12 @@ import ReceiptGenerator from "../pages/receiptgenerator/ReceiptGenerator";
 import RecipientsPage from "../pages/recipients/RecipientsPage";
 import ItemsPage from "../pages/items/Items";
 import Pending from "../pages/pending/Pending";
+import { useSelector } from "react-redux";
 
 export default function RootRoutes() {
+    const pendingBills = useSelector((state) => state.pending.list);
+    console.log(pendingBills,'pendingBills in routes')
+
     return (
         <Router>
             <div className="min-h-screen bg-gray-100">
@@ -40,15 +44,16 @@ export default function RootRoutes() {
                         <span>Recipients</span>
                     </Link>
 
-                  
+
 
                     {/* Floating Button */}
                     <div className="relative -top-6">
                         <Link
                             to="/receipt"
-                            className="w-14 h-14 rounded-full bg-blue-600 text-white flex items-center justify-center shadow-lg text-xl"
+                            className="w-14 h-14 rounded-full bg-blue-600 text-white font-bold flex items-center justify-center shadow-lg text-[32px]"
                         >
-                            ➕
+                            +
+                            {/* ➕  */}
                         </Link>
                     </div>
 
@@ -57,11 +62,12 @@ export default function RootRoutes() {
                         <span>Items</span>
                     </Link>
 
-                    <Link to="/pending" className="flex flex-col items-center text-xs text-gray-600">
+                    <Link to="/pending" className="flex flex-col items-center text-xs text-gray-600 relative">
                         ⏳
                         <span>Pending</span>
+                        {pendingBills.length > 0 ? <span className="w-3 h-3 absolute top-0 right-1 rounded-full grid place-content-center font-bold text-white bg-[tomato]">{pendingBills.length}</span>:null}
                     </Link>
-{/* 
+                    {/* 
                     <Link to="/profile" className="flex flex-col items-center text-xs text-gray-600">
                         ⚙️
                         <span>Profile</span>
