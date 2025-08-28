@@ -42,15 +42,16 @@ const Pending = () => {
                 }}
                 onCancel={() => setSelected(null)}
             />
-            <ReceiptModal
+           {selectedBill?.items.length > 0 ? <ReceiptModal
                 isOpen={showPreview}
                 onClose={() => setShowPreview(false)}
                 date={selectedBill?.date}
                 issuedTo={selectedBill?.customer}
-                items={selectedBill?.items}
+                billItems={selectedBill?.items}
                 grandTotal={selectedBill?.total}
+                pendingItem={null}
                 partialReceived={selectedBill?.receivedAmount}
-            />
+            />:null}
         </div>
     )
 }

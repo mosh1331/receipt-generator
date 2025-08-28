@@ -17,6 +17,7 @@ export default function ReceiptGenerator() {
   const [showPreview, setShowPreview] = useState(false)
   const [selectedItem, setSelectedItem] = useState(null)
   const [open, setOpen] = useState(false);
+  const [pendingItem,setPendingItem] = useState(null)
 
   const recipients = useSelector((state) => state.recipients.list);
   const products = useSelector((state) => state.items.list);
@@ -54,7 +55,7 @@ export default function ReceiptGenerator() {
     setShowDiscountInput(false)
   }
 
-  const grandTotal = items.reduce((sum, item) => sum + item.qty * (item?.discountedPrice ? item?.discountedPrice : item.price), 0);
+
 
   //set initial data
   useEffect(() => {
@@ -68,7 +69,7 @@ export default function ReceiptGenerator() {
 
   useEffect(() => {
     if (pendingBillItem?.id) {
-      const pendingItem = {
+      const oldBalance = {
         description: 'Old balance',
         price: pendingBillItem?.balance,
         qty: 1,
@@ -76,13 +77,16 @@ export default function ReceiptGenerator() {
         date:pendingBillItem?.date,
 
       }
-      setItems(prev => [...prev, pendingItem])
+      // setItems(prev => [...prev, oldBalance])
       setIssuedTo(pendingBillItem?.customer)
+      setPendingItem(oldBalance)
     }
   }, [pendingBillItem])
 
+  console.log(items,'itemsitems')
 
-  console.log(items, 'items')
+  let grandTotal = items.reduce((sum, item) => sum + item.qty * (item?.discountedPrice ? item?.discountedPrice : item.price), 0);
+  if(pendingItem) grandTotal += pendingItem?.price
 
   return (
     <div className="p-2 max-w-md mx-auto space-y-6">
@@ -191,6 +195,21 @@ export default function ReceiptGenerator() {
 
           </div>
         ))}
+        {pendingItem ?   <div
+            
+            className={`bg-gray-100  shadow rounded-xl p-4  mb-4 flex flex-col gap-2 relative`}
+          >
+         <div className="flex gap-2 items-center">
+            <p className="">{pendingItem.description}</p>
+            <p className="bg-gray-200 rounded text-[10px] p-1 font-bold">{pendingItem.date}</p>
+          </div>
+
+            <div className="flex">
+              <p className="text-lg font-semibold text-[tomato]">₹{pendingItem?.price}</p>
+            </div>
+          
+
+          </div>:null}
 
         <button onClick={addItem} className="bg-blue-500 text-white px-4 py-2 rounded">
           + Add Item
@@ -213,15 +232,16 @@ export default function ReceiptGenerator() {
       /> : null}
 
       {/* Receipt Preview */}
-      <ReceiptModal
-        isOpen={showPreview} onClose={() => setShowPreview(false)} date={date} issuedTo={issuedTo} items={items} grandTotal={grandTotal}
-      />
+     {items?.length>0 ?  <ReceiptModal
+        isOpen={showPreview} onClose={() => setShowPreview(false)} date={date} issuedTo={issuedTo} pendingItem={pendingItem} billItems={items} grandTotal={grandTotal}
+      />:null}
       <ConfirmModal
         isOpen={open}
         message="Do you really want to reset everything?"
         onConfirm={() => {
           setOpen(false)
           resetForm()
+          setPendingItem(null)
         }}
         onCancel={() => setOpen(false)}
       />

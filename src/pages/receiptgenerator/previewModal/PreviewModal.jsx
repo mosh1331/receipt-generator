@@ -4,11 +4,14 @@ import React, { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { addPendingBill, removePendingBill, updatePendingBill } from "../../../redux/slice/pendingBillsSlice";
 
-export default function ReceiptModal({ isOpen, onClose, date, issuedTo, items, grandTotal,partialReceived=0 }) {
+export default function ReceiptModal({ isOpen, onClose, date, issuedTo, billItems, grandTotal,partialReceived=0,pendingItem }) {
+    console.log(billItems,'bill items')
     const receiptRef = useRef(null);
     const [showAmountInput, setShowAmountInput] = useState(false)
     const [receivedAmount, setReceivedAmount] = useState(0)
     const pendingBills = useSelector((state) => state.pending.list);
+
+    const items = pendingItem ?  [...billItems,pendingItem] : [...billItems]
 
     const dispatch = useDispatch()
 
