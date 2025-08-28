@@ -10,7 +10,7 @@ export default function RootRoutes() {
     const pendingBills = useSelector((state) => state.pending.list);
     console.log(pendingBills,'pendingBills in routes')
 
-    return (
+return (
         <Router>
             <div className="min-h-screen bg-gray-100">
                 {/* Navbar */}

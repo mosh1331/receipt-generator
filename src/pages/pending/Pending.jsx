@@ -31,7 +31,7 @@ const Pending = () => {
     console.log(selectedBill,'selectedBill')
 
     return (
-        <div>
+        <div className='pb-40'>
             {bills?.map(i => <PendingBillCard key={i.id} bill={i} onAddAnotherBill={() => onAddAnotherBill(i)} onPay={() => onMarkAsReceived(i)} onRemove={() => onRemove(i)} />)}
             <ConfirmModal
                 isOpen={!!selected}
