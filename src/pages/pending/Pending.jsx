@@ -46,6 +46,7 @@ const Pending = () => {
                 isOpen={showPreview}
                 onClose={() => setShowPreview(false)}
                 date={selectedBill?.date}
+                billID={selectedBill?.id}
                 issuedTo={selectedBill?.customer}
                 billItems={selectedBill?.items}
                 grandTotal={selectedBill?.total}

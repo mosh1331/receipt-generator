@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { ChevronDown, ChevronUp } from "lucide-react"; // nice icons
+import dayjs from "dayjs";
 
 const PendingBillCard = ({ bill, onPay, onRemove, onAddAnotherBill }) => {
   const [isExpanded, setIsExpanded] = useState(false);
@@ -47,7 +48,7 @@ const PendingBillCard = ({ bill, onPay, onRemove, onAddAnotherBill }) => {
             <p>
               <span className="font-medium">Received:</span> ₹{bill.receivedAmount}
             </p>
-            <p className="text-xs text-gray-400">Date: {bill.date}</p>
+            <p className="text-xs text-gray-400">Date: {dayjs(bill.id).format("DD-MM-YYYY HH:MM a")}</p>
           </div>
 
           {/* Items Preview */}
@@ -60,6 +61,17 @@ const PendingBillCard = ({ bill, onPay, onRemove, onAddAnotherBill }) => {
                 <span className="truncate w-1/2">{item.description}</span>
                 <span>
                   {item.qty} × ₹{item.price}
+                </span>
+              </div>
+            ))}
+            {bill.transactions?.map((item, idx) => (
+              <div
+                key={idx}
+                className="flex justify-between text-xs text-gray-700 py-1"
+              >
+                <span className=" w-1/2">Received @ {item.date}</span>
+                <span>
+                   - ₹{item.amount}
                 </span>
               </div>
             ))}

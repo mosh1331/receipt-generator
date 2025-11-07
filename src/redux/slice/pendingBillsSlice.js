@@ -1,4 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit'
+import dayjs from 'dayjs'
 
 const pendingBillsSlice = createSlice({
   name: 'pendingBills',
@@ -8,31 +9,54 @@ const pendingBillsSlice = createSlice({
   reducers: {
     addPendingBill: (state, action) => {
       // action.payload = { id, customer, items, total, receivedAmount }
-      const { total, receivedAmount = 0 } = action.payload
+      const { id, customer, items, total, receivedAmount = 0 } = action.payload
 
-      if (receivedAmount === 0) {
-        state.list.push({ ...action.payload, status: 'unpaid', balance: total })
-      } else if (receivedAmount < total) {
-        state.list.push({
-          ...action.payload,
-          status: 'partial'
-        })
-      }
+      const transactions =
+        receivedAmount > 0
+          ? [{ amount: receivedAmount, date: dayjs().format("HH:MM a DD-MMM-YYYY") }]
+          : []
+
+      const balance = total - receivedAmount
+
+      let status = 'unpaid'
+      if (receivedAmount > 0 && receivedAmount < total) status = 'partial'
+      if (receivedAmount >= total) status = 'paid'
+
+      state.list.push({
+        id,
+        customer,
+        items,
+        total,
+        receivedAmount,
+        balance,
+        transactions,
+        status
+      })
     },
 
     updatePendingBill: (state, action) => {
-      // action.payload = { id, ...updates }
-      const { id, customer, receivedAmount, ...updates } = action.payload
-      const index = state.list.findIndex(bill => bill.customer === customer)
+      const updatedBill = action.payload
+      const index = state.list.findIndex(
+        bill => bill.customer === updatedBill.customer
+      )
+
       if (index !== -1) {
-        if (receivedAmount > 0) {
-          state.list[index] = {
-            ...state.list[index],
-            ...updates,
-            status: 'partial'
-          }
-        } else {
-          state.list[index] = { ...state.list[index], ...updates }
+        const totalReceived = updatedBill.transactions.reduce(
+          (sum, t) => sum + t.amount,
+          0
+        )
+        const balance = updatedBill.total - totalReceived
+
+        let status = 'unpaid'
+        if (totalReceived > 0 && totalReceived < updatedBill.total)
+          status = 'partial'
+        if (totalReceived >= updatedBill.total) status = 'paid'
+
+        state.list[index] = {
+          ...updatedBill,
+          receivedAmount: totalReceived,
+          balance,
+          status
         }
       }
     },
