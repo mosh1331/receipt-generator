@@ -8,6 +8,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { loadRecipients } from "../redux/slice/recipientsSlice";
 import { loadItems } from "../redux/slice/itemsSlice";
 import UnitsPage from "../pages/units/UnitsPage";
+import BackupRestoreButton from "../pages/BackupPage";
 
 export default function RootRoutes() {
     const pendingBills = useSelector((state) => state.pending.list);
@@ -44,8 +45,8 @@ export default function RootRoutes() {
                         <Link to="/pending" className="text-blue-600 hover:underline">
                             Pending
                         </Link>
-                          <Link to="/units" className="text-blue-600 hover:underline">
-                            Units
+                          <Link to="/backup" className="text-blue-600 hover:underline">
+                            backup
                         </Link>
                     </div>
                 </nav>
@@ -82,9 +83,9 @@ export default function RootRoutes() {
                         {pendingBills.length > 0 ? <span className="w-3 h-3 absolute top-0 right-1 rounded-full grid place-content-center font-bold text-white bg-[tomato]">{pendingBills.length}</span> : null}
                     </Link>
                     
-                    <Link to="/units" className="flex flex-col items-center text-xs text-gray-600">
+                    <Link to="/backup" className="flex flex-col items-center text-xs text-gray-600">
                         ⚙️
-                        <span>Units</span>
+                        <span>Backup</span>
                     </Link>  
                 </nav>
 
@@ -98,6 +99,7 @@ export default function RootRoutes() {
                         <Route path="/receipt" element={<ReceiptGenerator />} />
                         <Route path="/pending" element={<Pending />} />
                         <Route path="/units" element={<UnitsPage />} />
+                        <Route path="/backup" element={<BackupRestoreButton />} />
                         <Route path="*" element={<RecipientsPage />} /> {/* Default route */}
                     </Routes>
                 </div>
