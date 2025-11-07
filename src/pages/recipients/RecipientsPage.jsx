@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { addRecipient, removeRecipient, resetRecipients } from "../../redux/slice/recipientsSlice";
+import { addRecipientToDB, removeRecipientFromDB, resetRecipients } from "../../redux/slice/recipientsSlice";
 import ConfirmModal from "../../common/confirmmodal/ConfirmModal";
 
 export default function RecipientsPage() {
@@ -11,7 +11,7 @@ export default function RecipientsPage() {
 
   const handleAdd = () => {
     if (!name.trim()) return;
-    dispatch(addRecipient(name));
+    dispatch(addRecipientToDB(name));
     setName("");
   };
 
@@ -38,7 +38,7 @@ export default function RecipientsPage() {
           <li key={idx} className="p-2 border  capitalize rounded flex justify-between">
             {r}
             <button
-              onClick={() => dispatch(removeRecipient(idx))}
+              onClick={() => dispatch(removeRecipientFromDB(idx))}
               className="text-red-500"
             >
               ✕

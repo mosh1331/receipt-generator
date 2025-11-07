@@ -1,16 +1,26 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
 import ReceiptGenerator from "../pages/receiptgenerator/ReceiptGenerator";
 import RecipientsPage from "../pages/recipients/RecipientsPage";
 import ItemsPage from "../pages/items/Items";
 import Pending from "../pages/pending/Pending";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { loadRecipients } from "../redux/slice/recipientsSlice";
+import { loadItems } from "../redux/slice/itemsSlice";
+import UnitsPage from "../pages/units/UnitsPage";
 
 export default function RootRoutes() {
     const pendingBills = useSelector((state) => state.pending.list);
-    console.log(pendingBills,'pendingBills in routes')
+    console.log(pendingBills, 'pendingBills in routes')
 
-return (
+    const dispatch = useDispatch();
+
+    useEffect(() => {
+        dispatch(loadRecipients());
+        dispatch(loadItems())
+    }, [dispatch]);
+
+    return (
         <Router>
             <div className="min-h-screen bg-gray-100">
                 {/* Navbar */}
@@ -27,11 +37,15 @@ return (
                         <Link to="/items" className="text-blue-600 hover:underline">
                             Items
                         </Link>
+
                         <Link to="/receipt" className="text-blue-600 hover:underline">
                             Generate
                         </Link>
                         <Link to="/pending" className="text-blue-600 hover:underline">
                             Pending
+                        </Link>
+                          <Link to="/units" className="text-blue-600 hover:underline">
+                            Units
                         </Link>
                     </div>
                 </nav>
@@ -65,13 +79,13 @@ return (
                     <Link to="/pending" className="flex flex-col items-center text-xs text-gray-600 relative">
                         ⏳
                         <span>Pending</span>
-                        {pendingBills.length > 0 ? <span className="w-3 h-3 absolute top-0 right-1 rounded-full grid place-content-center font-bold text-white bg-[tomato]">{pendingBills.length}</span>:null}
+                        {pendingBills.length > 0 ? <span className="w-3 h-3 absolute top-0 right-1 rounded-full grid place-content-center font-bold text-white bg-[tomato]">{pendingBills.length}</span> : null}
                     </Link>
-                    {/* 
-                    <Link to="/profile" className="flex flex-col items-center text-xs text-gray-600">
+                    
+                    <Link to="/units" className="flex flex-col items-center text-xs text-gray-600">
                         ⚙️
-                        <span>Profile</span>
-                    </Link>  */}
+                        <span>Units</span>
+                    </Link>  
                 </nav>
 
 
@@ -83,6 +97,7 @@ return (
                         <Route path="/items" element={<ItemsPage />} />
                         <Route path="/receipt" element={<ReceiptGenerator />} />
                         <Route path="/pending" element={<Pending />} />
+                        <Route path="/units" element={<UnitsPage />} />
                         <Route path="*" element={<RecipientsPage />} /> {/* Default route */}
                     </Routes>
                 </div>

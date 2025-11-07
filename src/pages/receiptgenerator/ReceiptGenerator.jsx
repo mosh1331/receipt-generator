@@ -7,7 +7,7 @@ import DiscountInputModal from "./discounInputModal/DiscountInputModal";
 import PriceField from "./priceField/PriceField";
 import ConfirmModal from "../../common/confirmmodal/ConfirmModal";
 import { useLocation } from "react-router-dom";
-import { isPending } from "@reduxjs/toolkit";
+import Select from "react-select";
 
 export default function ReceiptGenerator() {
   const [date, setDate] = useState();
@@ -17,7 +17,7 @@ export default function ReceiptGenerator() {
   const [showPreview, setShowPreview] = useState(false)
   const [selectedItem, setSelectedItem] = useState(null)
   const [open, setOpen] = useState(false);
-  const [pendingItem,setPendingItem] = useState(null)
+  const [pendingItem, setPendingItem] = useState(null)
 
   const recipients = useSelector((state) => state.recipients.list);
   const products = useSelector((state) => state.items.list);
@@ -36,7 +36,7 @@ export default function ReceiptGenerator() {
   };
 
   const addItem = () => {
-    setItems([...items, { description: "", qty: 1, price: 0}]);
+    setItems([...items, { description: "", qty: 1, price: 0 }]);
   };
 
   const resetForm = () => {
@@ -74,7 +74,7 @@ export default function ReceiptGenerator() {
         price: pendingBillItem?.balance,
         qty: 1,
         isPending: true,
-        date:pendingBillItem?.date,
+        date: pendingBillItem?.date,
 
       }
       // setItems(prev => [...prev, oldBalance])
@@ -83,10 +83,10 @@ export default function ReceiptGenerator() {
     }
   }, [pendingBillItem])
 
-  console.log(items,'itemsitems')
+  console.log(items, 'itemsitems')
 
   let grandTotal = items.reduce((sum, item) => sum + item.qty * (item?.discountedPrice ? item?.discountedPrice : item.price), 0);
-  if(pendingItem) grandTotal += pendingItem?.price
+  if (pendingItem) grandTotal += pendingItem?.price
 
   return (
     <div className="p-2 max-w-md mx-auto space-y-6">
@@ -114,102 +114,117 @@ export default function ReceiptGenerator() {
             className={`${item?.isPending ? 'bg-gray-100' : 'bg-white'}  shadow rounded-xl p-4  mb-4 flex flex-col gap-2 relative`}
           >
             {/* Select Product */}
-          {item?.isPending ? <div className="flex gap-2 items-center">
-            <p className="">{item.description}</p>
-            <p className="bg-gray-200 rounded text-[10px] p-1 font-bold">{item.date}</p>
-          </div>:  <select
-              className="capitalize border p-2 rounded w-full"
-              name="item"
-              value={item.id}
-              onChange={(e) => {
-                const selected = products.find((p) => p.id === e.target.value);
+            {item?.isPending ? <div className="flex gap-2 items-center">
+              <p className="">{item.description}</p>
+              <p className="bg-gray-200 rounded text-[10px] p-1 font-bold">{item.date}</p>
+            </div> : <Select
+              className="capitalize w-full text-sm"
+              value={
+                item.description
+                  ? { label: item.description, value: item.id }
+                  : null
+              }
+              onChange={(selected) => {
+                if (!selected) return;
                 handleItemChange(idx, "id", selected.id);
                 handleItemChange(idx, "description", selected.name);
-                handleItemChange(idx, "price", selected.price); // auto-fill price
+                handleItemChange(idx, "price", selected.price);
               }}
-            >
-              <option value="">Select Item</option>
-              {products.map((r) => (
-                <option key={r.id} value={r.id}>
-                  {r.name}
-                </option>
-              ))}
-            </select>}
+              options={products.map((p) => ({
+                value: p.id,
+                label: p.name,
+                ...p
+              }))}
+              placeholder="Select Item"
+              isClearable
+              styles={{
+                control: (base) => ({
+                  ...base,
+                  borderColor: "#d1d5db",
+                  borderRadius: "0.375rem",
+                  padding: "2px 4px",
+                }),
+                menu: (base) => ({
+                  ...base,
+                  zIndex: 9999,
+                }),
+              }}
+            />}
 
             {/* Quantity + Price Row */}
-            {item?.isPending ? 
-            <div className="flex">
-              <p className="text-lg font-semibold text-[tomato]">₹{item?.price}</p>
-            </div>
-            :
-            <div className="flex items-center justify-between gap-2">
-              {/* Qty with increment/decrement */}
-              <div className="flex items-center border rounded-lg w-[60%]">
-                <button
-                  type="button"
-                  onClick={() =>
-                    handleItemChange(idx, "qty", Math.max(1, item.qty - 1))
-                  }
-                  className="px-3 py-1 text-lg text-gray-600 hover:text-black"
-                >
-                  –
-                </button>
-
-                <input
-                  type="number"
-                  min="1"
-                  value={item.qty}
-                  onChange={(e) => handleItemChange(idx, "qty", e.target.value)}
-                  className="w-full text-center p-2 focus:outline-none"
-                  step={1}
-                />
-
-                <button
-                  type="button"
-                  onClick={() =>
-                    handleItemChange(idx, "qty", Number(item.qty) + 1)
-                  }
-                  className="px-3 py-1 text-lg text-gray-600 hover:text-black"
-                >
-                  +
-                </button>
+            {item?.isPending ?
+              <div className="flex">
+                <p className="text-lg font-semibold text-[tomato]">₹{item?.price}</p>
               </div>
+              :
+              <div className="flex items-center justify-between gap-2">
+                {/* Qty with increment/decrement */}
+                <div className="flex items-center border rounded-lg w-[60%]">
+                  <button
+                    type="button"
+                    onClick={() =>
+                      handleItemChange(idx, "qty", Math.max(1, item.qty - 1))
+                    }
+                    className="px-3 py-1 text-lg text-gray-600 hover:text-black"
+                  >
+                    –
+                  </button>
 
-              {/* Price */}
-              <div className="flex-1 text-right">
-                {/* <p className="text-sm text-gray-500">Price</p> */}
-                <PriceField item={item} />
-                {/* Discount Trigger */}
-                {item?.discountedPrice > 0 ? null : <button
-                  onClick={() => {
-                    setSelectedItem(item);
-                    setShowDiscountInput(true);
-                  }}
-                  className="self-end text-[8px] bg-gradient-to-r from-teal-500 to-green-500 text-white px-3 py-1 rounded-lg shadow hover:opacity-90"
-                >
-                  + Discount
-                </button>}
-              </div>
-            </div>}
+                  <input
+                    type="number"
+                    min="1"
+                    value={item.qty}
+                    onChange={(e) => handleItemChange(idx, "qty", e.target.value)}
+                    className="w-full text-center p-2 focus:outline-none"
+                    step={1}
+                  />
+
+                  <button
+                    type="button"
+                    onClick={() =>
+                      handleItemChange(idx, "qty", Number(item.qty) + 1)
+                    }
+                    className="px-3 py-1 text-lg text-gray-600 hover:text-black"
+                  >
+                    +
+                  </button>
+                </div>
+
+                {/* Price */}
+                <div className="flex-1 text-right">
+                  {/* <p className="text-sm text-gray-500">Price</p> */}
+                  <PriceField item={item} />
+                  {/* Discount Trigger */}
+                  {item?.discountedPrice > 0 ? null : <button
+                    onClick={() => {
+                      setSelectedItem(item);
+                      setShowDiscountInput(true);
+                    }}
+                    className="self-end text-[8px] bg-gradient-to-r from-teal-500 to-green-500 text-white px-3 py-1 rounded-lg shadow hover:opacity-90"
+                  >
+                    + Discount
+                  </button>}
+                </div>
+              </div>}
 
 
           </div>
         ))}
-        {pendingItem ?   <div
-            
-            className={`bg-gray-100  shadow rounded-xl p-4  mb-4 flex flex-col gap-2 relative`}
-          >
-         <div className="flex gap-2 items-center">
+        {pendingItem ? <div
+
+          className={`bg-gray-100  shadow rounded-xl p-4  mb-4 flex flex-col gap-2 relative`}
+        >
+          <div className="flex gap-2 items-center">
             <p className="">{pendingItem.description}</p>
             <p className="bg-gray-200 rounded text-[10px] p-1 font-bold">{pendingItem.date}</p>
           </div>
 
-            <div className="flex">
-              <p className="text-lg font-semibold text-[tomato]">₹{pendingItem?.price}</p>
-            </div>
-          
+          <div className="flex">
+            <p className="text-lg font-semibold text-[tomato]">₹{pendingItem?.price}</p>
+          </div>
 
-          </div>:null}
+
+        </div> : null}
 
         <button onClick={addItem} className="bg-blue-500 text-white px-4 py-2 rounded">
           + Add Item
@@ -232,9 +247,9 @@ export default function ReceiptGenerator() {
       /> : null}
 
       {/* Receipt Preview */}
-     {items?.length>0 ?  <ReceiptModal
-        isOpen={showPreview} onClose={() => setShowPreview(false)} date={date} issuedTo={issuedTo} pendingItem={pendingItem} billItems={items} grandTotal={grandTotal}
-      />:null}
+      {items?.length > 0 ? <ReceiptModal
+        isOpen={showPreview} onClose={() => setShowPreview(false)} date={date} issuedTo={issuedTo} pendingItem={pendingItem} billID={null} billItems={items} grandTotal={grandTotal}
+      /> : null}
       <ConfirmModal
         isOpen={open}
         message="Do you really want to reset everything?"
