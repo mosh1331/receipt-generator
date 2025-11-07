@@ -58,14 +58,15 @@ export default function AddItemModal({ open, onClose }) {
           Add New Item
         </h2>
 
-        <div className="space-y-3">
+        <div className="space-y-2">
           <input
             type="text"
             placeholder="Item name"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            className="border border-gray-300 p-2 rounded-lg w-full text-sm"
+            className="border mb-2 border-gray-300 p-2 rounded-lg w-full text-sm"
           />
+          <label>Price</label>
 
           <input
             type="number"
@@ -76,7 +77,8 @@ export default function AddItemModal({ open, onClose }) {
             className="border border-gray-300 p-2 rounded-lg w-full text-sm"
           />
 
-          <div className="flex gap-2">
+          <div className="flex flex-col">
+            {/* <label>Quantity</label>
             <input
               type="number"
               min="1"
@@ -84,8 +86,8 @@ export default function AddItemModal({ open, onClose }) {
               value={qty}
               onChange={(e) => setQty(e.target.value)}
               className="border border-gray-300 p-2 rounded-lg flex-1 text-sm"
-            />
-            <select
+            /> */}
+            {/* <select
               className="border border-gray-300 p-2 rounded-lg w-24 text-sm capitalize"
               value={unit}
               onChange={(e) => setUnit(e.target.value)}
@@ -95,10 +97,10 @@ export default function AddItemModal({ open, onClose }) {
                   {u}
                 </option>
               ))}
-            </select>
+            </select> */}
           </div>
 
-          <div className="flex flex-col sm:flex-row gap-2">
+          {/* <div className="flex flex-col sm:flex-row gap-2">
             <input
               type="date"
               value={stockedDate}
@@ -113,7 +115,7 @@ export default function AddItemModal({ open, onClose }) {
               className="border border-gray-300 p-2 rounded-lg flex-1 text-sm"
               placeholder="Expiry Date"
             />
-          </div>
+          </div> */}
         </div>
 
         <button
