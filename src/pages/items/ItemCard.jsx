@@ -2,19 +2,23 @@ import React, { useState } from "react";
 import { ChevronDown, ChevronUp, Trash2 } from "lucide-react";
 import { useDispatch } from "react-redux";
 import { removeItemFromDB } from "../../redux/slice/itemsSlice";
+import ConfirmModal from "../../common/confirmmodal/ConfirmModal";
 
 export default function ItemCard({ item }) {
   const dispatch = useDispatch();
   const [expanded, setExpanded] = useState(false);
+  const [selected, setSelected] = useState(null)
+
 
   const totalValue = item.price * item.qty;
   const expired = item.expiryDate && new Date(item.expiryDate) < new Date();
 
+
+
   return (
     <div
-      className={`bg-white rounded-xl shadow-md p-4 border border-gray-100 transition-all duration-300 ${
-        expanded ? "shadow-lg" : ""
-      }`}
+      className={`bg-white rounded-xl shadow-md p-4 border border-gray-100 transition-all duration-300 ${expanded ? "shadow-lg" : ""
+        }`}
     >
       <div
         className="flex justify-between items-center cursor-pointer"
@@ -53,9 +57,8 @@ export default function ItemCard({ item }) {
 
           {item.expiryDate && (
             <p
-              className={`text-xs ${
-                expired ? "text-red-600 font-semibold" : "text-gray-500"
-              }`}
+              className={`text-xs ${expired ? "text-red-600 font-semibold" : "text-gray-500"
+                }`}
             >
               <span className="font-medium text-gray-700">Expires:</span>{" "}
               {new Date(item.expiryDate).toLocaleDateString()}
@@ -63,7 +66,7 @@ export default function ItemCard({ item }) {
           )}
 
           <button
-            onClick={() => dispatch(removeItemFromDB(item.id))}
+            onClick={() => setSelected(item.id)}
             className="flex items-center gap-1 text-red-500 text-xs mt-2 hover:text-red-700"
           >
             <Trash2 size={14} />
@@ -71,6 +74,15 @@ export default function ItemCard({ item }) {
           </button>
         </div>
       )}
+      <ConfirmModal
+        isOpen={!!selected}
+        message="Do you really want to delete this Item?"
+        onConfirm={() => {
+          dispatch(removeItemFromDB(selected))
+          setSelected(null)
+        }}
+        onCancel={() => setSelected(null)}
+      />
     </div>
   );
 }
