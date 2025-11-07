@@ -111,11 +111,6 @@ export default function ReceiptModal({
         }
     };
 
-    // useEffect(() => {
-    //     if (partialReceived > 0) {
-    //         setReceivedAmount(partialReceived);
-    //     }
-    // }, [partialReceived]);
 
     if (!isOpen) return null;
 
@@ -124,6 +119,7 @@ export default function ReceiptModal({
 
     const totalReceived = transactions.reduce((sum, t) => sum + t.amount, 0);
     const balance = grandTotal - totalReceived;
+    const previousBalance =grandTotal - totalReceived
 
     return (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-2 h-[100vh] overflow-auto">
@@ -158,23 +154,37 @@ export default function ReceiptModal({
                             </tr>
                         </thead>
                         <tbody>
-                            {items.map((item, idx) => (
-                                <tr key={idx} className="border-b">
-                                    <td className="py-2 capitalize">{item.description}</td>
-                                    <td className="text-center">{item.qty}</td>
+                            {transactions.length > 1 ?
+                                <tr className="border-b">
+                                    <td className="py-2 capitalize">Bill Amount</td>
+                                    <td className="text-center"></td>
                                     <td className="text-center">
-                                        ₹{item.discountedPrice || item.price}
+
                                     </td>
-                                    <td className="text-center">
-                                        ₹
-                                        {item.qty *
-                                            (item.discountedPrice ? item.discountedPrice : item.price)}
+                                    <td className="text-center font-bold">
+                                        ₹{grandTotal}
                                     </td>
                                 </tr>
-                            ))}
+                                : items.map((item, idx) => (
+                                    <tr key={idx} className="border-b">
+                                        <td className="py-2 capitalize">{item.description}</td>
+                                        <td className="text-center">{item.qty}</td>
+                                        <td className="text-center">
+                                            ₹{item.discountedPrice || item.price}
+                                        </td>
+                                        <td className="text-center">
+                                            ₹
+                                            {item.qty *
+                                                (item.discountedPrice ? item.discountedPrice : item.price)}
+                                        </td>
+                                    </tr>
+                                ))}
                         </tbody>
                     </table>
-
+                    {transactions.length > 1 ? null:<div className="flex justify-end gap-4 mt-4 text-[12px] font-bold">
+                        <span>GRAND TOTAL :</span>
+                        <span>₹{grandTotal}</span>
+                    </div>}
                     {/* Transactions Section */}
                     {transactions.length > 0 && (
                         <div className="mt-4 relative z-10">
@@ -197,10 +207,7 @@ export default function ReceiptModal({
 
                     {/* Totals */}
                     <div className="mb-20">
-                        <div className="flex justify-end gap-4 mt-4 text-[12px] font-bold">
-                            <span>GRAND TOTAL :</span>
-                            <span>₹{grandTotal}</span>
-                        </div>
+
 
                         {(totalReceived > 0 || receivedAmount > 0) && (
                             <table className="w-full mt-4 text-[10px] border-t border-b border-gray-300">
