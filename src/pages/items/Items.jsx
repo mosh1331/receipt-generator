@@ -32,7 +32,7 @@ export default function ItemsPage() {
 
       <SearchBar value={query} onChange={setQuery} placeholder="Search items..." />
 
-      <div className="grid gap-3 mt-4">
+      <div className="grid gap-3 mt-4 pb-40">
         {filteredItems.length > 0 ? (
           filteredItems.map((item, idx) => <ItemCard key={idx} item={item} />)
         ) : (
