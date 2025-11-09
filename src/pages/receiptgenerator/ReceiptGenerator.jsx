@@ -56,6 +56,7 @@ export default function ReceiptGenerator() {
 
 
   //set initial data
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     const initalProduct = products.length > 0 ? products[0] : ''
     const initalReceivee = recipients.length > 0 ? recipients[0] : ''
