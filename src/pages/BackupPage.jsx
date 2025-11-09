@@ -2,13 +2,9 @@ import React from "react";
 import * as XLSX from "xlsx";
 import { useDispatch, useSelector } from "react-redux";
 import {
-  addItemToDB,
-  resetItemsInDB,
   loadItems,
 } from "../redux/slice/itemsSlice";
 import {
-  addRecipientToDB,
-  resetRecipients,
   loadRecipients,
 } from "../redux/slice/recipientsSlice";
 import { db } from "../db";

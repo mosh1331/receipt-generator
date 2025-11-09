@@ -1,5 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
-import html2canvas from "html2canvas";
+import React, { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import ReceiptModal from "./previewModal/PreviewModal";
 import dayjs from "dayjs";
@@ -21,7 +20,6 @@ export default function ReceiptGenerator() {
 
   const recipients = useSelector((state) => state.recipients.list);
   const products = useSelector((state) => state.items.list);
-  const bills = useSelector((state) => state.pending.list);
 
   const location = useLocation()
   const pendingBillItem = location.state
