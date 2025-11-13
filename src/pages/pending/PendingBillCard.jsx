@@ -5,6 +5,8 @@ import dayjs from "dayjs";
 const PendingBillCard = ({ bill, onPay, onRemove, onAddAnotherBill }) => {
   const [isExpanded, setIsExpanded] = useState(false);
 
+  console.log(bill,'bill')
+
   return (
     <div className="bg-white rounded-xl shadow-md border border-gray-200 mb-4 overflow-hidden">
       {/* Header Row */}
@@ -48,7 +50,7 @@ const PendingBillCard = ({ bill, onPay, onRemove, onAddAnotherBill }) => {
             <p>
               <span className="font-medium">Received:</span> ₹{bill.receivedAmount}
             </p>
-            <p className="text-xs text-gray-400">Date: {dayjs(bill.id).format("DD-MM-YYYY HH:MM a")}</p>
+            <p className="text-xs text-gray-400">Date: {bill.id}</p>
           </div>
 
           {/* Items Preview */}

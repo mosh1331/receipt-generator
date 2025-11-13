@@ -64,7 +64,7 @@ export default function ReceiptModal({
             }
         } else {
             const newBill = {
-                id: dayjs().format("DD-MM-YYYY hh:mm:ss"),
+                id: dayjs().format("DD-MM-YYYY hh:mm"),
                 customer: issuedTo,
                 items,
                 total: grandTotal,
