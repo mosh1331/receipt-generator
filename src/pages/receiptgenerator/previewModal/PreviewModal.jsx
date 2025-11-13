@@ -111,7 +111,6 @@ export default function ReceiptModal({
         }
     };
 
-
     if (!isOpen) return null;
 
     const existingBill = pendingBills.find((i) => i.id === billID);
@@ -120,6 +119,8 @@ export default function ReceiptModal({
     const totalReceived = transactions.reduce((sum, t) => sum + t.amount, 0);
     const balance = grandTotal - totalReceived;
     const previousBalance =grandTotal - totalReceived
+console.log(transactions,'transactions')
+
 
     return (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-2 h-[100vh] overflow-auto">
@@ -197,7 +198,7 @@ export default function ReceiptModal({
                                         key={idx}
                                         className="flex justify-between text-[10px] text-gray-700"
                                     >
-                                        <span>Received at {dayjs(t.date).format("DD MMM, hh:mm A")}</span>
+                                        <span>Received at {t.date}</span>
                                         <span>₹{t.amount}</span>
                                     </li>
                                 ))}
