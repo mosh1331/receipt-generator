@@ -28,7 +28,7 @@ const Pending = () => {
     const onRemove = (item) => {
         setSelected(item)
     }
-    console.log(selectedBill,'selectedBill')
+    console.log(bills,'bills')
 
     return (
         <div className='pb-40'>

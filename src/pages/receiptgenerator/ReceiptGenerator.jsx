@@ -68,6 +68,7 @@ export default function ReceiptGenerator() {
 
   useEffect(() => {
     if (pendingBillItem?.id) {
+      console.log(pendingBillItem,'pendingBillItem')
       const oldBalance = {
         description: 'Old balance',
         price: pendingBillItem?.balance,

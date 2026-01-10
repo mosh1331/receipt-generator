@@ -8,30 +8,51 @@ const pendingBillsSlice = createSlice({
   },
   reducers: {
     addPendingBill: (state, action) => {
-      // action.payload = { id, customer, items, total, receivedAmount }
+      // action.payload = { id, customer, items, total, receivedAmount? }
       const { id, customer, items, total, receivedAmount = 0 } = action.payload
+      // 🔒 Prevent duplicate pending bills for same customer
+        console.log(state.list,'bill cust')
 
+      const existingIndex = state.list.findIndex(
+        bill => bill.customer === customer
+      )
+
+      // Build initial transactions array
       const transactions =
         receivedAmount > 0
-          ? [{ amount: receivedAmount, date: dayjs().format("HH:MM a DD-MMM-YYYY") }]
+          ? [
+              {
+                amount: Number(receivedAmount),
+                date: dayjs().format('HH:mm a DD-MMM-YYYY')
+              }
+            ]
           : []
 
-      const balance = total - receivedAmount
+      const totalReceived = transactions.reduce((sum, t) => sum + t.amount, 0)
+
+      const balance = total - totalReceived
 
       let status = 'unpaid'
-      if (receivedAmount > 0 && receivedAmount < total) status = 'partial'
-      if (receivedAmount >= total) status = 'paid'
+      if (totalReceived > 0 && totalReceived < total) status = 'partial'
+      if (totalReceived >= total) status = 'paid'
 
-      state.list.push({
+      const billData = {
         id,
         customer,
         items,
         total,
-        receivedAmount,
-        balance,
         transactions,
+        receivedAmount: totalReceived,
+        balance,
         status
-      })
+      }
+
+      // 🔁 Replace existing bill OR add new
+      if (existingIndex !== -1) {
+        state.list[existingIndex] = billData
+      } else {
+        state.list.push(billData)
+      }
     },
 
     updatePendingBill: (state, action) => {

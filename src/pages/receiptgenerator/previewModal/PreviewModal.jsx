@@ -25,6 +25,9 @@ export default function ReceiptModal({
     const pendingBills = useSelector((state) => state.pending.list);
     const dispatch = useDispatch();
 
+    console.log(pendingItem,'pendingItem')
+    console.log(billItems,'billItems')
+
     const items = pendingItem ? [...billItems, pendingItem] : [...billItems];
 
     // Generate receipt as image
