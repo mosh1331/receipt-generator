@@ -25,8 +25,8 @@ export default function ReceiptModal({
     const pendingBills = useSelector((state) => state.pending.list);
     const dispatch = useDispatch();
 
-    console.log(pendingItem,'pendingItem')
-    console.log(billItems,'billItems')
+    console.log(pendingItem, 'pendingItem')
+    console.log(billItems, 'billItems')
 
     const items = pendingItem ? [...billItems, pendingItem] : [...billItems];
 
@@ -43,6 +43,11 @@ export default function ReceiptModal({
     };
 
     const handlePendingBill = (existingBill) => {
+        if (!receivedAmount || Number(receivedAmount) < 1) {
+            // still allow receipt sharing, but skip pending logic
+            shareReceipt();
+            return;
+        }
         const newTransaction = {
             amount: Number(receivedAmount),
             date: dayjs().format("DD-MM-YYYY hh:mm A"),
@@ -121,8 +126,8 @@ export default function ReceiptModal({
 
     const totalReceived = transactions.reduce((sum, t) => sum + t.amount, 0);
     const balance = grandTotal - totalReceived;
-    const previousBalance =grandTotal - totalReceived
-console.log(transactions,'transactions')
+    const previousBalance = grandTotal - totalReceived
+    console.log(transactions, 'transactions')
 
 
     return (
@@ -185,7 +190,7 @@ console.log(transactions,'transactions')
                                 ))}
                         </tbody>
                     </table>
-                    {transactions.length > 1 ? null:<div className="flex justify-end gap-4 mt-4 text-[12px] font-bold">
+                    {transactions.length > 1 ? null : <div className="flex justify-end gap-4 mt-4 text-[12px] font-bold">
                         <span>GRAND TOTAL :</span>
                         <span>₹{grandTotal}</span>
                     </div>}
@@ -241,6 +246,7 @@ console.log(transactions,'transactions')
                         Cancel
                     </button>
                     <button
+                        disabled={showAmountInput && receivedAmount < 1}
                         onClick={checkWhetherUnpaid}
                         className="bg-green-500 w-1/2 text-white px-4 py-2"
                     >
@@ -261,7 +267,7 @@ console.log(transactions,'transactions')
                         <div className="relative w-full">
                             <input
                                 type="number"
-                                min="1"
+                                min={1}
                                 value={receivedAmount}
                                 onChange={(e) => setReceivedAmount(e.target.value)}
                                 className="w-full border p-2 rounded pr-8"
