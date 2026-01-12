@@ -71,7 +71,7 @@ const PendingBillCard = ({ bill, onPay, onRemove, onAddAnotherBill }) => {
                 key={idx}
                 className="flex justify-between text-xs text-gray-700 py-1"
               >
-                <span className=" w-1/2">Received @ {item.date}</span>
+                {/* <span className=" w-1/2">Received @ {item.date}</span> */}
                 <span>
                    - ₹{item.amount}
                 </span>

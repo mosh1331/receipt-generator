@@ -30,6 +30,8 @@ export default function ReceiptModal({
 
     const items = pendingItem ? [...billItems, pendingItem] : [...billItems];
 
+    console.log(items,'items items')
+
     // Generate receipt as image
     const generateImage = () => {
         if (receiptRef.current) {
@@ -43,19 +45,25 @@ export default function ReceiptModal({
     };
 
     const handlePendingBill = (existingBill) => {
-        if (!receivedAmount || Number(receivedAmount) < 1) {
-            // still allow receipt sharing, but skip pending logic
-            shareReceipt();
-            return;
-        }
+        // if (showAmountInput &&  !receivedAmount || Number(receivedAmount) < 1) {
+        //     // still allow receipt sharing, but skip pending logic
+        //     shareReceipt();
+        //     return;
+        // }
+
+
         const newTransaction = {
-            amount: Number(receivedAmount),
+            amount:  Number(receivedAmount),
             date: dayjs().format("DD-MM-YYYY hh:mm A"),
         };
         console.log(existingBill, '==== existing bill')
         console.log(newTransaction, '==== newTransaction')
         if (existingBill) {
-            const updatedBill = {
+            if(!receivedAmount || Number(receivedAmount) < 1){
+                 shareReceipt();
+                return
+            }
+            let updatedBill = {
                 ...existingBill,
                 transactions: [...(existingBill.transactions || []), newTransaction],
             };
@@ -64,6 +72,8 @@ export default function ReceiptModal({
                 (s, t) => s + t.amount,
                 0
             );
+
+         
 
             if (totalReceived >= existingBill.total) {
                 dispatch(removePendingBill(existingBill.id));
@@ -87,7 +97,9 @@ export default function ReceiptModal({
     const checkWhetherUnpaid = () => {
         setReceivedAmount(0);
         setShowAmountInput(false)
+        console.log(pendingBills,'pendingBills')
         const existingBill = pendingBills.find((i) => i.id === billID);
+        console.log(existingBill,'existing bill')
         if (receivedAmount > 0 && receivedAmount >= grandTotal && !existingBill) {
             shareReceipt();
         } else {
@@ -206,7 +218,7 @@ export default function ReceiptModal({
                                         key={idx}
                                         className="flex justify-between text-[10px] text-gray-700"
                                     >
-                                        <span>Received at {t.date}</span>
+                                        <span>Received </span>
                                         <span>₹{t.amount}</span>
                                     </li>
                                 ))}
@@ -246,7 +258,6 @@ export default function ReceiptModal({
                         Cancel
                     </button>
                     <button
-                        disabled={showAmountInput && receivedAmount < 1}
                         onClick={checkWhetherUnpaid}
                         className="bg-green-500 w-1/2 text-white px-4 py-2"
                     >
@@ -267,7 +278,6 @@ export default function ReceiptModal({
                         <div className="relative w-full">
                             <input
                                 type="number"
-                                min={1}
                                 value={receivedAmount}
                                 onChange={(e) => setReceivedAmount(e.target.value)}
                                 className="w-full border p-2 rounded pr-8"
