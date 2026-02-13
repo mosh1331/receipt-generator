@@ -38,7 +38,7 @@ export default function RecipientsPage() {
           <li key={idx} className="p-2 border  capitalize rounded flex justify-between">
             {r}
             <button
-              onClick={() => dispatch(removeRecipientFromDB(idx))}
+              onClick={() => dispatch(removeRecipientFromDB(r))}
               className="text-red-500"
             >
               ✕
