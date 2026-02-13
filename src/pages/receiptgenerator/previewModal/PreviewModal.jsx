@@ -117,7 +117,7 @@ export default function ReceiptModal({
                     await navigator.share({
                         files: [file],
                         title: "Receipt",
-                        text: "Here is your receipt.",
+                        text: "",
                     });
                 } else {
                     generateImage();
