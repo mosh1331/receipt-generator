@@ -68,7 +68,7 @@ export default function ReceiptGenerator() {
 
   useEffect(() => {
     if (pendingBillItem?.id) {
-      console.log(pendingBillItem,'pendingBillItem')
+      console.log(pendingBillItem, 'pendingBillItem')
       const oldBalance = {
         description: 'Old balance',
         price: pendingBillItem?.balance,
@@ -101,13 +101,33 @@ export default function ReceiptGenerator() {
           }}
           className="w-full border p-2 rounded"
         />
-        <select className="capitalize border rounded p-2" name="name" value={issuedTo} onChange={(e) => setIssuedTo(e.target.value)} id="">
-          {recipients.map((r, idx) => (
-            <option key={idx} className="p-2 border capitalize rounded flex justify-between">
-              {r}
-            </option>
-          ))}
-        </select>
+        <Select
+          className="capitalize w-full text-sm"
+          placeholder="Select customer"
+          value={issuedTo ? { label: issuedTo, value: issuedTo } : null}
+          onChange={(selected) => {
+            if (!selected) return;
+            setIssuedTo(selected.value);
+          }}
+          options={recipients.map((r) => ({
+            value: r,
+            label: r,
+          }))}
+          isClearable
+          styles={{
+            control: (base) => ({
+              ...base,
+              borderColor: "#d1d5db",
+              borderRadius: "0.375rem",
+              padding: "2px 4px",
+              minHeight: "38px",
+            }),
+            menu: (base) => ({
+              ...base,
+              zIndex: 9999,
+            }),
+          }}
+        />
         {items.map((item, idx) => (
           <div
             key={idx}
