@@ -165,16 +165,17 @@ export default function ReceiptModal({
                     </div>
 
                     {/* Items Table */}
-                    <table className="w-full mt-6 text-[10px] relative z-10 border-t border-b border-gray-300">
-                        <thead>
-                            <tr className="border-b">
-                                <th className="text-left py-2">Description</th>
-                                <th>Qty</th>
-                                <th>Price</th>
-                                <th>Subtotal</th>
+                    <table className="w-full mt-6 text-[10px] relative z-10 border-t border-b border-gray-300 table-fixed">
+                        <thead  className={' '} style={{display:'block',width:'100%'}}>
+                            <tr className="flex border-b  w-full">
+                                <th className="flex-1 text-left py-2">Description</th>
+                                <th className="flex-1 ">Qty</th>
+                                <th className="flex-1 ">Price</th>
+                                <th className="flex-1 ">Subtotal</th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody style={{display:'block', height:'40vh',overflow:'auto'}}>
+
                             {transactions.length > 1 ?
                                 <tr className="border-b">
                                     <td className="py-2 capitalize">Bill Amount</td>
@@ -222,6 +223,7 @@ export default function ReceiptModal({
                                         <span>₹{t.amount}</span>
                                     </li>
                                 ))}
+                                
                             </ul>
                         </div>
                     )}
