@@ -107,29 +107,52 @@ export default function ReceiptModal({
         }
     };
 
-    const shareReceipt = async () => {
-        if (navigator.share && navigator.canShare) {
-            const canvas = await html2canvas(receiptRef.current, { scale: 2 });
-            canvas.toBlob(async (blob) => {
-                const file = new File([blob], "receipt.png", { type: "image/png" });
+   const shareReceipt = async () => {
+    if (navigator.share) {
+        // Options to handle the scrollable body
+        const canvas = await html2canvas(receiptRef.current, {
+            scale: 2,
+            useCORS: true,
+            // 'onclone' is the magic part
+            onclone: (clonedDoc) => {
+                // Find the tbody inside the cloned document
+                const scrollableBody = clonedDoc.querySelector('tbody');
+                if (scrollableBody) {
+                    // Force the cloned tbody to show all content
+                    scrollableBody.style.height = 'auto';
+                    scrollableBody.style.maxHeight = 'none';
+                    scrollableBody.style.overflow = 'visible';
+                    scrollableBody.style.display = 'table-row-group'; // Reset to standard table behavior
+                }
+            }
+        });
 
-                if (navigator.canShare({ files: [file] })) {
+        canvas.toBlob(async (blob) => {
+            const file = new File([blob], "receipt.png", { type: "image/png" });
+
+            if (navigator.canShare && navigator.canShare({ files: [file] })) {
+                try {
                     await navigator.share({
                         files: [file],
                         title: "Receipt",
-                        text: "",
+                        text: "Shared from My App",
                     });
-                } else {
-                    generateImage();
+                } catch (err) {
+                    console.error("Error sharing:", err);
                 }
-            });
-            setReceivedAmount(0);
-            setShowAmountInput(false);
-            onClose();
-        } else {
-            generateImage();
-        }
-    };
+            } else {
+                generateImage();
+            }
+        });
+        
+        // State resets
+        setReceivedAmount(0);
+        setShowAmountInput(false);
+        onClose();
+    } else {
+        generateImage();
+    }
+};
 
     if (!isOpen) return null;
 
@@ -177,10 +200,10 @@ export default function ReceiptModal({
                         <tbody style={{display:'block', height:'40vh',overflow:'auto'}}>
 
                             {transactions.length > 1 ?
-                                <tr className="border-b">
-                                    <td className="py-2 capitalize">Bill Amount</td>
-                                    <td className="text-center"></td>
-                                    <td className="text-center">
+                                <tr className="border-b flex" >
+                                    <td className="py-2 flex-1 capitalize">Bill Amount</td>
+                                    <td className="text-center flex-1"></td>
+                                    <td className="text-center flex-1">
 
                                     </td>
                                     <td className="text-center font-bold">
@@ -188,13 +211,13 @@ export default function ReceiptModal({
                                     </td>
                                 </tr>
                                 : items.map((item, idx) => (
-                                    <tr key={idx} className="border-b">
-                                        <td className="py-2 capitalize">{item.description}</td>
-                                        <td className="text-center">{item.qty}</td>
-                                        <td className="text-center">
+                                    <tr key={idx} className="border-b flex">
+                                        <td className="py-2 capitalize flex-1">{item.description}</td>
+                                        <td className="text-center flex-1">{item.qty}</td>
+                                        <td className="text-center flex-1">
                                             ₹{item.discountedPrice || item.price}
                                         </td>
-                                        <td className="text-center">
+                                        <td className="text-center flex-1">
                                             ₹
                                             {item.qty *
                                                 (item.discountedPrice ? item.discountedPrice : item.price)}
