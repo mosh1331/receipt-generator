@@ -135,7 +135,7 @@ export default function ReceiptModal({
                     await navigator.share({
                         files: [file],
                         title: "Receipt",
-                        text: "Shared from My App",
+                        text: "",
                     });
                 } catch (err) {
                     console.error("Error sharing:", err);
