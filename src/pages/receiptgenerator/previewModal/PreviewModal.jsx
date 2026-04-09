@@ -7,6 +7,8 @@ import {
     removePendingBill,
     updatePendingBill,
 } from "../../../redux/slice/pendingBillsSlice";
+import ItemsTable from "./ItemsTable";
+import ActionButtons from "./ActionButtons";
 
 export default function ReceiptModal({
     isOpen,
@@ -22,6 +24,7 @@ export default function ReceiptModal({
     const receiptRef = useRef(null);
     const [showAmountInput, setShowAmountInput] = useState(false);
     const [receivedAmount, setReceivedAmount] = useState(0);
+    const [showItems, setShowItems] = useState(true);
     const pendingBills = useSelector((state) => state.pending.list);
     const dispatch = useDispatch();
 
@@ -30,7 +33,7 @@ export default function ReceiptModal({
 
     const items = pendingItem ? [...billItems, pendingItem] : [...billItems];
 
-    console.log(items,'items items')
+    console.log(items, 'items items')
 
     // Generate receipt as image
     const generateImage = () => {
@@ -45,22 +48,15 @@ export default function ReceiptModal({
     };
 
     const handlePendingBill = (existingBill) => {
-        // if (showAmountInput &&  !receivedAmount || Number(receivedAmount) < 1) {
-        //     // still allow receipt sharing, but skip pending logic
-        //     shareReceipt();
-        //     return;
-        // }
-
-
         const newTransaction = {
-            amount:  Number(receivedAmount),
+            amount: Number(receivedAmount),
             date: dayjs().format("DD-MM-YYYY hh:mm A"),
         };
         console.log(existingBill, '==== existing bill')
         console.log(newTransaction, '==== newTransaction')
         if (existingBill) {
-            if(!receivedAmount || Number(receivedAmount) < 1){
-                 shareReceipt();
+            if (!receivedAmount || Number(receivedAmount) < 1) {
+                shareReceipt();
                 return
             }
             let updatedBill = {
@@ -73,7 +69,7 @@ export default function ReceiptModal({
                 0
             );
 
-         
+
 
             if (totalReceived >= existingBill.total) {
                 dispatch(removePendingBill(existingBill.id));
@@ -97,9 +93,9 @@ export default function ReceiptModal({
     const checkWhetherUnpaid = () => {
         setReceivedAmount(0);
         setShowAmountInput(false)
-        console.log(pendingBills,'pendingBills')
+        console.log(pendingBills, 'pendingBills')
         const existingBill = pendingBills.find((i) => i.id === billID);
-        console.log(existingBill,'existing bill')
+        console.log(existingBill, 'existing bill')
         if (receivedAmount > 0 && receivedAmount >= grandTotal && !existingBill) {
             shareReceipt();
         } else {
@@ -107,52 +103,54 @@ export default function ReceiptModal({
         }
     };
 
-   const shareReceipt = async () => {
-    if (navigator.share) {
-        // Options to handle the scrollable body
-        const canvas = await html2canvas(receiptRef.current, {
-            scale: 2,
-            useCORS: true,
-            // 'onclone' is the magic part
-            onclone: (clonedDoc) => {
-                // Find the tbody inside the cloned document
-                const scrollableBody = clonedDoc.querySelector('tbody');
-                if (scrollableBody) {
-                    // Force the cloned tbody to show all content
-                    scrollableBody.style.height = 'auto';
-                    scrollableBody.style.maxHeight = 'none';
-                    scrollableBody.style.overflow = 'visible';
-                    scrollableBody.style.display = 'table-row-group'; // Reset to standard table behavior
+    const shareReceipt = async () => {
+        if (navigator.share) {
+            // Options to handle the scrollable body
+            const canvas = await html2canvas(receiptRef.current, {
+                scale: 2,
+                useCORS: true,
+                // 'onclone' is the magic part
+                onclone: (clonedDoc) => {
+                    // Find the tbody inside the cloned document
+                    const scrollableBody = clonedDoc.querySelector('tbody');
+                    const checkBox = clonedDoc.querySelector('#checkbox-container');
+                    checkBox.style.display = 'none'; // Hide the checkbox in the cloned version
+                    if (scrollableBody) {
+                        // Force the cloned tbody to show all content
+                        scrollableBody.style.height = 'auto';
+                        scrollableBody.style.maxHeight = 'none';
+                        scrollableBody.style.overflow = 'visible';
+                        scrollableBody.style.display = 'table-row-group'; // Reset to standard table behavior
+                    }
                 }
-            }
-        });
+            });
 
-        canvas.toBlob(async (blob) => {
-            const file = new File([blob], "receipt.png", { type: "image/png" });
+            canvas.toBlob(async (blob) => {
+                const file = new File([blob], "receipt.png", { type: "image/png" });
 
-            if (navigator.canShare && navigator.canShare({ files: [file] })) {
-                try {
-                    await navigator.share({
-                        files: [file],
-                        title: "Receipt",
-                        text: "",
-                    });
-                } catch (err) {
-                    console.error("Error sharing:", err);
+                if (navigator.canShare && navigator.canShare({ files: [file] })) {
+                    try {
+                        await navigator.share({
+                            files: [file],
+                            title: "Receipt",
+                            text: "",
+                        });
+                    } catch (err) {
+                        console.error("Error sharing:", err);
+                    }
+                } else {
+                    generateImage();
                 }
-            } else {
-                generateImage();
-            }
-        });
-        
-        // State resets
-        setReceivedAmount(0);
-        setShowAmountInput(false);
-        onClose();
-    } else {
-        generateImage();
-    }
-};
+            });
+
+            // State resets
+            setReceivedAmount(0);
+            setShowAmountInput(false);
+            onClose();
+        } else {
+            generateImage();
+        }
+    };
 
     if (!isOpen) return null;
 
@@ -161,23 +159,22 @@ export default function ReceiptModal({
 
     const totalReceived = transactions.reduce((sum, t) => sum + t.amount, 0);
     const balance = grandTotal - totalReceived;
-    const previousBalance = grandTotal - totalReceived
-    console.log(transactions, 'transactions')
+
 
 
     return (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-2 h-[100vh] overflow-auto">
-            <div className="bg-white rounded-xl shadow-lg max-w-sm w-full relative overflow-hidden">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex  justify-center z-50 p-2 h-[100vh]  overflow-auto">
+            <div className="rounded-xl pt-10 shadow-lg max-w-sm w-full relative overflow-hidden">
                 <div
                     ref={receiptRef}
-                    className="relative bg-white p-6 rounded-xl shadow-lg overflow-hidden"
+                    className="h-[65vh] relative bg-white  p-6 rounded-xl shadow-lg overflow-hidden"
                 >
                     {/* Decorative Background */}
                     <div className="absolute top-0 right-0 w-24 h-24 bg-teal-500 rotate-45 translate-x-12 -translate-y-12"></div>
                     <div className="absolute bottom-0 left-0 w-24 h-24 bg-pink-300 rotate-45 -translate-x-12 translate-y-12"></div>
 
                     {/* Header */}
-                    <div className="relative z-10 text-left mb-20">
+                    <div className="relative z-10 text-left mb-8">
                         <h1 className="text-2xl font-bold">POLAR</h1>
                         <h1 className="text-2xl font-bold uppercase">Agencies</h1>
 
@@ -188,44 +185,7 @@ export default function ReceiptModal({
                     </div>
 
                     {/* Items Table */}
-                    <table className="w-full mt-6 text-[10px] relative z-10 border-t border-b border-gray-300 table-fixed">
-                        <thead  className={' '} style={{display:'block',width:'100%'}}>
-                            <tr className="flex border-b  w-full">
-                                <th className="flex-1 text-left py-2">Description</th>
-                                <th className="flex-1 ">Qty</th>
-                                <th className="flex-1 ">Price</th>
-                                <th className="flex-1 ">Subtotal</th>
-                            </tr>
-                        </thead>
-                        <tbody style={{display:'block', height:'40vh',overflow:'auto'}}>
-
-                            {transactions.length > 1 ?
-                                <tr className="border-b flex" >
-                                    <td className="py-2 flex-1 capitalize">Bill Amount</td>
-                                    <td className="text-center flex-1"></td>
-                                    <td className="text-center flex-1">
-
-                                    </td>
-                                    <td className="text-center font-bold">
-                                        ₹{grandTotal}
-                                    </td>
-                                </tr>
-                                : items.map((item, idx) => (
-                                    <tr key={idx} className="border-b flex">
-                                        <td className="py-2 capitalize flex-1">{item.description}</td>
-                                        <td className="text-center flex-1">{item.qty}</td>
-                                        <td className="text-center flex-1">
-                                            ₹{item.discountedPrice || item.price}
-                                        </td>
-                                        <td className="text-center flex-1">
-                                            ₹
-                                            {item.qty *
-                                                (item.discountedPrice ? item.discountedPrice : item.price)}
-                                        </td>
-                                    </tr>
-                                ))}
-                        </tbody>
-                    </table>
+                    <ItemsTable showItems={showItems} transactions={transactions} items={items}  grandTotal={grandTotal}/>
                     {transactions.length > 1 ? null : <div className="flex justify-end gap-4 mt-4 text-[12px] font-bold">
                         <span>GRAND TOTAL :</span>
                         <span>₹{grandTotal}</span>
@@ -246,13 +206,13 @@ export default function ReceiptModal({
                                         <span>₹{t.amount}</span>
                                     </li>
                                 ))}
-                                
+
                             </ul>
                         </div>
                     )}
 
                     {/* Totals */}
-                    <div className="mb-20">
+                    <div className="mb-2">
 
 
                         {(totalReceived > 0 || receivedAmount > 0) && (
@@ -272,33 +232,20 @@ export default function ReceiptModal({
                             </table>
                         )}
                     </div>
+                    <div className="flex ml-4" id="checkbox-container" data-html2canvas-ignore>
+                        <input type="checkbox" id="toggleItems" className="hidden" onChange={() => setShowItems(!showItems)} checked={showItems} />
+                        <label htmlFor="toggleItems" className="text-[10px] cursor-pointer flex items-center gap-1">
+                            <span>Show Items</span>
+                            <div className={`w-4 h-4 border rounded ${showItems ? 'bg-green-500' : 'bg-gray-300'}`}></div>
+                        </label>
+                    </div>
                 </div>
 
                 {/* Footer Buttons */}
-                <div className="flex w-full">
-                    <button
-                        onClick={onClose}
-                        className="bg-[tomato] w-1/2 text-white px-4 py-2"
-                    >
-                        Cancel
-                    </button>
-                    <button
-                        onClick={checkWhetherUnpaid}
-                        className="bg-green-500 w-1/2 text-white px-4 py-2"
-                    >
-                        Share
-                    </button>
-                </div>
+              <ActionButtons onClose={onClose} checkWhetherUnpaid={checkWhetherUnpaid} setShowAmountInput={setShowAmountInput} existingBill={existingBill} />
 
                 {/* Add Payment */}
                 {existingBill ? <div className="w-full">
-                    <button
-                        onClick={() => setShowAmountInput(true)}
-                        className="bg-gray-600 w-full text-white px-4 py-2"
-                    >
-                        Add Received Amount
-                    </button>
-
                     {showAmountInput && (
                         <div className="relative w-full">
                             <input
