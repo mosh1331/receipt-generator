@@ -104,7 +104,8 @@ export default function ReceiptModal({
                 handlePendingBill(existingBill);
             }
         } catch (error) {
-            setError(error)
+            setError(error?.message ? error.message : error);
+
         }
 
     };
@@ -160,7 +161,7 @@ export default function ReceiptModal({
             }
         } catch (error) {
             console.log(error, 'error in sharing receipt')
-            setError(error)
+            setError(error?.message ? error.message : error);
         }
     };
 
