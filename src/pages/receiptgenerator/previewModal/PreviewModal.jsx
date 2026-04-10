@@ -181,7 +181,7 @@ export default function ReceiptModal({
             <div className="rounded-xl pt-10 shadow-lg max-w-sm w-full relative overflow-hidden">
                 <div
                     ref={receiptRef}
-                    className="h-[65vh] relative bg-white  p-6 rounded-xl shadow-lg overflow-hidden"
+                    className="h-[75vh] relative bg-white  p-6 rounded-xl shadow-lg overflow-hidden"
                 >
                     {/* Decorative Background */}
                     {/* <div className="absolute top-0 right-0 w-24 h-24 bg-teal-500 rotate-45 translate-x-12 -translate-y-12"></div> */}
