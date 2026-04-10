@@ -184,8 +184,8 @@ export default function ReceiptModal({
                     className="h-[65vh] relative bg-white  p-6 rounded-xl shadow-lg overflow-hidden"
                 >
                     {/* Decorative Background */}
-                    <div className="absolute top-0 right-0 w-24 h-24 bg-teal-500 rotate-45 translate-x-12 -translate-y-12"></div>
-                    <div className="absolute bottom-0 left-0 w-24 h-24 bg-pink-300 rotate-45 -translate-x-12 translate-y-12"></div>
+                    {/* <div className="absolute top-0 right-0 w-24 h-24 bg-teal-500 rotate-45 translate-x-12 -translate-y-12"></div> */}
+                    {/* <div className="absolute bottom-0 left-0 w-24 h-24 bg-pink-300 rotate-45 -translate-x-12 translate-y-12"></div> */}
 
                     {/* Header */}
                     {error && <div className="bg-red-100 text-red-700 p-2 rounded mb-4 text-center">{error}
