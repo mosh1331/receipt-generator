@@ -12,7 +12,8 @@ const ItemsTable = ({ showItems, transactions, items, grandTotal }) => {
                     <th className="flex-1 ">Subtotal</th>
                 </tr>
             </thead>
-            <tbody style={{ display: 'block', maxHeight: '18vh', overflow: 'auto' }}>
+            <tbody >
+                
                 {transactions.length > 1 ?
                     <tr className="border-b flex" >
                         <td className="py-2 flex-1 capitalize">Bill Amount</td>

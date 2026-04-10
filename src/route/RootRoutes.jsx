@@ -1,6 +1,7 @@
 import React, { useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
 import ReceiptGenerator from "../pages/receiptgenerator/ReceiptGenerator";
+import ReceiptPreviewPage from "../pages/receiptgenerator/previewModal/ReceiptPreviewPage";
 import RecipientsPage from "../pages/recipients/RecipientsPage";
 import ItemsPage from "../pages/items/Items";
 import Pending from "../pages/pending/Pending";
@@ -97,6 +98,7 @@ export default function RootRoutes() {
                         <Route path="/recipients" element={<RecipientsPage />} />
                         <Route path="/items" element={<ItemsPage />} />
                         <Route path="/receipt" element={<ReceiptGenerator />} />
+                        <Route path="/receipt-preview" element={<ReceiptPreviewPage />} />
                         <Route path="/pending" element={<Pending />} />
                         <Route path="/units" element={<UnitsPage />} />
                         <Route path="/backup" element={<BackupRestoreButton />} />

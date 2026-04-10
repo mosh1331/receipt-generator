@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
-import ReceiptModal from "./previewModal/PreviewModal";
 import dayjs from "dayjs";
+import { useNavigate } from "react-router-dom";
 import DiscountInputModal from "./discounInputModal/DiscountInputModal";
 import PriceField from "./priceField/PriceField";
 import ConfirmModal from "../../common/confirmmodal/ConfirmModal";
@@ -13,13 +13,13 @@ export default function ReceiptGenerator() {
   const [issuedTo, setIssuedTo] = useState("");
   const [items, setItems] = useState([]);
   const [showDiscountInput, setShowDiscountInput] = useState(false)
-  const [showPreview, setShowPreview] = useState(false)
   const [selectedItem, setSelectedItem] = useState(null)
   const [open, setOpen] = useState(false);
   const [pendingItem, setPendingItem] = useState(null)
 
   const recipients = useSelector((state) => state.recipients.list);
   const products = useSelector((state) => state.items.list);
+  const navigate = useNavigate();
 
   const location = useLocation()
   const pendingBillItem = location.state
@@ -253,7 +253,19 @@ export default function ReceiptGenerator() {
           <button onClick={() => setOpen(true)} className="bg-gray-500 text-white px-4 py-2 rounded flex-1">
             Reset
           </button>
-          <button onClick={() => setShowPreview(true)} className="bg-green-500 text-white px-4 py-2 rounded flex-1">
+          <button
+            onClick={() => navigate('/receipt-preview', {
+              state: {
+                date,
+                issuedTo,
+                billID: null,
+                billItems: items,
+                grandTotal,
+                pendingItem
+              }
+            })}
+            className="bg-green-500 text-white px-4 py-2 rounded flex-1"
+          >
             Preview
           </button>
         </div>
@@ -266,10 +278,6 @@ export default function ReceiptGenerator() {
         applyDiscount={onDiscountApply}
       /> : null}
 
-      {/* Receipt Preview */}
-      {items?.length > 0 ? <ReceiptModal
-        isOpen={showPreview} onClose={() => setShowPreview(false)} date={date} issuedTo={issuedTo} pendingItem={pendingItem} billID={null} billItems={items} grandTotal={grandTotal}
-      /> : null}
       <ConfirmModal
         isOpen={open}
         message="Do you really want to reset everything?"

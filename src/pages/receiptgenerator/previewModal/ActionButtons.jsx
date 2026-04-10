@@ -1,5 +1,5 @@
 import React from 'react'
-import { Share, SidebarCloseIcon, DollarSign, IndianRupee } from "lucide-react";
+import { Share, SidebarCloseIcon, DollarSign } from "lucide-react";
 
 const ActionButtons = ({ onClose, checkWhetherUnpaid, setShowAmountInput, existingBill }) => {
     return (
@@ -21,7 +21,7 @@ const ActionButtons = ({ onClose, checkWhetherUnpaid, setShowAmountInput, existi
                     onClick={() => setShowAmountInput(true)}
                     className="flex-1 min-w-0 inline-flex h-12 items-center justify-center bg-white text-slate-700 transition hover:bg-slate-100 focus:outline-none"
                 >
-                    <IndianRupee className="h-5 w-5" />
+                    <DollarSign className="h-5 w-5" />
                 </button>
             ) : null}
         </div>

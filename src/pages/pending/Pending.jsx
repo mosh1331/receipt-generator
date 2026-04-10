@@ -4,14 +4,11 @@ import PendingBillCard from './PendingBillCard';
 import { useNavigate } from 'react-router-dom';
 import ConfirmModal from '../../common/confirmmodal/ConfirmModal';
 import { removePendingBill } from '../../redux/slice/pendingBillsSlice';
-import ReceiptModal from '../receiptgenerator/previewModal/PreviewModal';
 import SearchBar from '../../common/search/SearchBar';
 
 const Pending = () => {
     const bills = useSelector((state) => state.pending.list);
     const [selected, setSelected] = useState(null)
-    const [selectedBill, setSelectedBill] = useState(null)
-    const [showPreview, setShowPreview] = useState(false)
     const [query, setQuery] = useState("");
 
     const filteredItems = useMemo(() => {
@@ -22,17 +19,35 @@ const Pending = () => {
     }, [bills, query]);
 
 
-    const navigate = useNavigate()
+    const navigate = useNavigate()  
     const dispatch = useDispatch()
 
     const onAddAnotherBill = (billItem) => {
-        navigate('/receipt', { state: billItem })
-
+        navigate('/receipt-preview', {
+            state: {
+                date: billItem.date,
+                issuedTo: billItem.customer,
+                billID: billItem.id,
+                billItems: billItem.items,
+                grandTotal: billItem.total,
+                partialReceived: billItem.receivedAmount || 0,
+                pendingItem: null,
+            },
+        })
     }
 
     const onMarkAsReceived = (billItem) => {
-        setSelectedBill(billItem)
-        setShowPreview(true)
+        navigate('/receipt-preview', {
+            state: {
+                date: billItem.date,
+                issuedTo: billItem.customer,
+                billID: billItem.id,
+                billItems: billItem.items,
+                grandTotal: billItem.total,
+                partialReceived: billItem.receivedAmount || 0,
+                pendingItem: null,
+            },
+        })
     }
 
     const onRemove = (item) => {
@@ -54,17 +69,6 @@ const Pending = () => {
                 }}
                 onCancel={() => setSelected(null)}
             />
-            {selectedBill?.items.length > 0 ? <ReceiptModal
-                isOpen={showPreview}
-                onClose={() => setShowPreview(false)}
-                date={selectedBill?.date}
-                billID={selectedBill?.id}
-                issuedTo={selectedBill?.customer}
-                billItems={selectedBill?.items}
-                grandTotal={selectedBill?.total}
-                pendingItem={null}
-                partialReceived={selectedBill?.receivedAmount}
-            /> : null}
         </div>
     )
 }
