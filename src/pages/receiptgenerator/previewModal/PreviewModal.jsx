@@ -24,6 +24,7 @@ export default function ReceiptModal({
     const receiptRef = useRef(null);
     const [showAmountInput, setShowAmountInput] = useState(false);
     const [receivedAmount, setReceivedAmount] = useState(0);
+    const [error, setError] = useState("error");
     const [showItems, setShowItems] = useState(true);
     const pendingBills = useSelector((state) => state.pending.list);
     const dispatch = useDispatch();
@@ -91,64 +92,75 @@ export default function ReceiptModal({
     };
 
     const checkWhetherUnpaid = () => {
-        setReceivedAmount(0);
-        setShowAmountInput(false)
-        console.log(pendingBills, 'pendingBills')
-        const existingBill = pendingBills.find((i) => i.id === billID);
-        console.log(existingBill, 'existing bill')
-        if (receivedAmount > 0 && receivedAmount >= grandTotal && !existingBill) {
-            shareReceipt();
-        } else {
-            handlePendingBill(existingBill);
+        try {
+            setReceivedAmount(0);
+            setShowAmountInput(false)
+            console.log(pendingBills, 'pendingBills')
+            const existingBill = pendingBills.find((i) => i.id === billID);
+            console.log(existingBill, 'existing bill')
+            if (receivedAmount > 0 && receivedAmount >= grandTotal && !existingBill) {
+                shareReceipt();
+            } else {
+                handlePendingBill(existingBill);
+            }
+        } catch (error) {
+            setError(error)
         }
+
     };
 
     const shareReceipt = async () => {
-        if (navigator.share) {
-            // Options to handle the scrollable body
-            const canvas = await html2canvas(receiptRef.current, {
-                scale: 2,
-                useCORS: true,
-                // 'onclone' is the magic part
-                onclone: (clonedDoc) => {
-                    // Find the tbody inside the cloned document
-                    const scrollableBody = clonedDoc.querySelector('tbody');
-                    const checkBox = clonedDoc.querySelector('#checkbox-container');
-                    checkBox.style.display = 'none'; // Hide the checkbox in the cloned version
-                    if (scrollableBody) {
-                        // Force the cloned tbody to show all content
-                        scrollableBody.style.height = 'auto';
-                        scrollableBody.style.maxHeight = 'none';
-                        scrollableBody.style.overflow = 'visible';
-                        scrollableBody.style.display = 'table-row-group'; // Reset to standard table behavior
+        try {
+            if (navigator.share) {
+                // Options to handle the scrollable body
+                const canvas = await html2canvas(receiptRef.current, {
+                    scale: 2,
+                    useCORS: true,
+                    // 'onclone' is the magic part
+                    onclone: (clonedDoc) => {
+                        // Find the tbody inside the cloned document
+                        const scrollableBody = clonedDoc.querySelector('tbody');
+                        const checkBox = clonedDoc.querySelector('#checkbox-container');
+                        checkBox.style.display = 'none'; // Hide the checkbox in the cloned version
+                        if (scrollableBody) {
+                            // Force the cloned tbody to show all content
+                            scrollableBody.style.height = 'auto';
+                            scrollableBody.style.maxHeight = 'none';
+                            scrollableBody.style.overflow = 'visible';
+                            scrollableBody.style.display = 'table-row-group'; // Reset to standard table behavior
+                        }
                     }
-                }
-            });
+                });
 
-            canvas.toBlob(async (blob) => {
-                const file = new File([blob], "receipt.png", { type: "image/png" });
+                canvas.toBlob(async (blob) => {
+                    const file = new File([blob], "receipt.png", { type: "image/png" });
 
-                if (navigator.canShare && navigator.canShare({ files: [file] })) {
-                    try {
-                        await navigator.share({
-                            files: [file],
-                            title: "Receipt",
-                            text: "",
-                        });
-                    } catch (err) {
-                        console.error("Error sharing:", err);
+                    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+                        try {
+                            await navigator.share({
+                                files: [file],
+                                title: "Receipt",
+                                text: "",
+                            });
+                        } catch (err) {
+                            console.error("Error sharing:", err);
+                        }
+                    } else {
+                        generateImage();
                     }
-                } else {
-                    generateImage();
-                }
-            });
+                });
 
-            // State resets
-            setReceivedAmount(0);
-            setShowAmountInput(false);
-            onClose();
-        } else {
-            generateImage();
+                // State resets
+                setReceivedAmount(0);
+                setShowAmountInput(false);
+                onClose();
+            } else {
+                generateImage();
+                console.log("Web Share API not supported, downloaded receipt as image instead.");
+            }
+        } catch (error) {
+            console.log(error, 'error in sharing receipt')
+            setError(error)
         }
     };
 
@@ -174,6 +186,9 @@ export default function ReceiptModal({
                     <div className="absolute bottom-0 left-0 w-24 h-24 bg-pink-300 rotate-45 -translate-x-12 translate-y-12"></div>
 
                     {/* Header */}
+                    {error && <div className="bg-red-100 text-red-700 p-2 rounded mb-4 text-center">{error}
+                        <button onClick={() => setError(null)} className="text-sm text-red-500 underline"> {' '}Dismiss</button>
+                    </div>}
                     <div className="relative z-10 text-left mb-8">
                         <h1 className="text-2xl font-bold">POLAR</h1>
                         <h1 className="text-2xl font-bold uppercase">Agencies</h1>
@@ -185,7 +200,7 @@ export default function ReceiptModal({
                     </div>
 
                     {/* Items Table */}
-                    <ItemsTable showItems={showItems} transactions={transactions} items={items}  grandTotal={grandTotal}/>
+                    <ItemsTable showItems={showItems} transactions={transactions} items={items} grandTotal={grandTotal} />
                     {transactions.length > 1 ? null : <div className="flex justify-end gap-4 mt-4 text-[12px] font-bold">
                         <span>GRAND TOTAL :</span>
                         <span>₹{grandTotal}</span>
@@ -242,7 +257,7 @@ export default function ReceiptModal({
                 </div>
 
                 {/* Footer Buttons */}
-              <ActionButtons onClose={onClose} checkWhetherUnpaid={checkWhetherUnpaid} setShowAmountInput={setShowAmountInput} existingBill={existingBill} />
+                <ActionButtons onClose={onClose} checkWhetherUnpaid={checkWhetherUnpaid} setShowAmountInput={setShowAmountInput} existingBill={existingBill} />
 
                 {/* Add Payment */}
                 {existingBill ? <div className="w-full">
