@@ -9,10 +9,13 @@ import {
 } from "../redux/slice/recipientsSlice";
 import { db } from "../db";
 
+
 export default function BackupRestoreButton() {
   const dispatch = useDispatch();
   const items = useSelector((state) => state.items.list);
   const recipients = useSelector((state) => state.recipients.list);
+  const bills = useSelector((state) => state.pending.list);
+
 
   // 📤 EXPORT
   const handleExport = () => {
@@ -26,9 +29,12 @@ export default function BackupRestoreButton() {
     const wsRecipients = XLSX.utils.json_to_sheet(
       recipients.map((r) => ({ name: r }))
     );
-    XLSX.utils.book_append_sheet(wb, wsRecipients, "Recipients");
 
-    XLSX.writeFile(wb, "backup_data.xlsx");
+    const wsBills = XLSX.utils.json_to_sheet(bills);
+    XLSX.utils.book_append_sheet(wb, wsBills, "Bills");
+    XLSX.utils.book_append_sheet(wb, wsRecipients, "Recipients");
+    const date = new Date();
+    XLSX.writeFile(wb, `backup_data_${date.toISOString().split('T')[0]}.xlsx`);
   };
 
   // 📥 IMPORT
