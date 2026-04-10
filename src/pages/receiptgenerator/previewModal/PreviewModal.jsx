@@ -122,7 +122,8 @@ export default function ReceiptModal({
                         // Find the tbody inside the cloned document
                         const scrollableBody = clonedDoc.querySelector('tbody');
                         const checkBox = clonedDoc.querySelector('#checkbox-container');
-                        checkBox.style.display = 'none'; // Hide the checkbox in the cloned version
+                        console.log(checkBox, 'checkBox doc')
+                        if(checkBox) checkBox.style.display = 'none'; // Hide the checkbox in the cloned version
                         if (scrollableBody) {
                             // Force the cloned tbody to show all content
                             scrollableBody.style.height = 'auto';
