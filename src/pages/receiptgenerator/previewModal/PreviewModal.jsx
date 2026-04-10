@@ -24,7 +24,7 @@ export default function ReceiptModal({
     const receiptRef = useRef(null);
     const [showAmountInput, setShowAmountInput] = useState(false);
     const [receivedAmount, setReceivedAmount] = useState(0);
-    const [error, setError] = useState("error");
+    const [error, setError] = useState(null);
     const [showItems, setShowItems] = useState(true);
     const pendingBills = useSelector((state) => state.pending.list);
     const dispatch = useDispatch();
