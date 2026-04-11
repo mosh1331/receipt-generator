@@ -79,7 +79,7 @@ export default function ReceiptGenerator() {
 
       }
       // setItems(prev => [...prev, oldBalance])
-      setIssuedTo(pendingBillItem?.customer)
+      setIssuedTo(pendingBillItem?.customer || pendingBillItem?.issuedTo || '')
       setPendingItem(oldBalance)
     }
   }, [pendingBillItem])

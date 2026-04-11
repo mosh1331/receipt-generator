@@ -23,6 +23,7 @@ const Pending = () => {
     const dispatch = useDispatch()
 
     const onAddAnotherBill = (billItem) => {
+        console.log(billItem, 'billItem in pending')
         navigate('/receipt', {
             state: {
                 date: billItem.date,
