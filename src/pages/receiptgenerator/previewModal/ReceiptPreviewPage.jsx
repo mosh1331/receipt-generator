@@ -166,7 +166,11 @@ export default function ReceiptPreviewPage() {
                     onclone: (clonedDoc) => {
                         const scrollableBody = clonedDoc.querySelector('tbody');
                         const checkBox = clonedDoc.querySelector('#checkbox-container');
+                        const hideColumn = clonedDoc.querySelector('.hide-column');
+                        const hideButtons = clonedDoc.querySelectorAll('.hide-btn');
                         if (checkBox) checkBox.style.display = 'none';
+                        if(hideColumn) hideColumn.style.display = 'none';
+                        hideButtons.forEach(btn => btn.style.display = 'none');
                         if (scrollableBody) {
                             scrollableBody.style.height = 'auto';
                             scrollableBody.style.maxHeight = 'none';
@@ -304,23 +308,24 @@ export default function ReceiptPreviewPage() {
                                 <thead className="bg-slate-50">
                                     <tr className="flex border-b w-full">
                                         <th className="flex-1 text-left py-3 px-2"> </th>
-                                        <th className="flex-1 text-left py-3 px-2">Amount</th>
-                                        <th className="w-16 py-3 px-2">Action</th>
+                                        <th className="w-16 py-3 px-2 hide-column">Action</th>
+                                        <th className="flex-1 text-right py-3 px-2 text-center">Amount</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     {transactions.map((t, idx) => (
                                         <tr key={idx} className="flex border-b w-full hover:bg-slate-50">
                                             <td className="flex-1 py-3 px-2">Received</td>
-                                            <td className="flex-1 py-3 px-2 font-semibold text-green-600">₹{t.amount}</td>
-                                            <td className="w-16 py-3 px-2 text-center">
+                                            <td className="flex-1 w-16  py-3 px-2 text-center">
                                                 <button
                                                     onClick={() => removeTransaction(idx)}
-                                                    className="text-red-500 hover:text-red-700 p-1"
+                                                    className="text-red-500 hide-btn hover:text-red-700 p-1"
                                                 >
                                                     <Trash2 className="h-4 w-4" />
                                                 </button>
                                             </td>
+                                            <td className="flex-1 text-right py-3 px-2 font-semibold text-green-600">₹{t.amount}</td>
+
                                         </tr>
                                     ))}
                                 </tbody>

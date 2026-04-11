@@ -23,7 +23,7 @@ const Pending = () => {
     const dispatch = useDispatch()
 
     const onAddAnotherBill = (billItem) => {
-        navigate('/receipt-preview', {
+        navigate('/receipt', {
             state: {
                 date: billItem.date,
                 issuedTo: billItem.customer,

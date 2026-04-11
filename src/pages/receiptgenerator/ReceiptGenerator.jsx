@@ -23,6 +23,7 @@ export default function ReceiptGenerator() {
 
   const location = useLocation()
   const pendingBillItem = location.state
+  console.log(pendingBillItem, 'pendingBillItem in receipt generator')
 
   //if coming from pending add default item 'old balance' '
 
@@ -67,11 +68,11 @@ export default function ReceiptGenerator() {
   }, [])
 
   useEffect(() => {
-    if (pendingBillItem?.id) {
+    if (pendingBillItem?.billID) {
       console.log(pendingBillItem, 'pendingBillItem')
       const oldBalance = {
         description: 'Old balance',
-        price: pendingBillItem?.balance,
+        price: pendingBillItem?.grandTotal - (pendingBillItem?.partialReceived || 0),
         qty: 1,
         isPending: true,
         date: pendingBillItem?.date,
