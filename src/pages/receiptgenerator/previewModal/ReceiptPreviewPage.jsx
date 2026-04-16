@@ -19,6 +19,7 @@ export default function ReceiptPreviewPage() {
     const [tempAmount, setTempAmount] = useState(0);
     const [error, setError] = useState(null);
     const [showItems, setShowItems] = useState(true);
+    const [selectedDeleteIndex, setSelectedDeleteIndex] = useState(null);
     const pendingBills = useSelector((state) => state.pending.list);
     const dispatch = useDispatch();
     const navigate = useNavigate();
@@ -55,7 +56,7 @@ export default function ReceiptPreviewPage() {
         if (receivedAmount > 0 && existingBill) {
             const newTransaction = {
                 amount: Number(receivedAmount),
-                date: dayjs().format("DD-MM-YYYY hh:mm A"),
+                date: dayjs().format("DD-MM-YYYY"),
             };
             let updatedBill = {
                 ...existingBill,
@@ -81,13 +82,14 @@ export default function ReceiptPreviewPage() {
         if (!existingBill) return;
         const updatedTransactions = transactions.filter((_, i) => i !== index);
         const totalReceived = updatedTransactions.reduce((s, t) => s + t.amount, 0);
-        
+
         // Always update the bill, even if all transactions are removed
         const updatedBill = {
             ...existingBill,
             transactions: updatedTransactions,
         };
         dispatch(updatePendingBill(updatedBill));
+        setSelectedDeleteIndex(null);
     };
 
     // Generate receipt as image
@@ -102,10 +104,13 @@ export default function ReceiptPreviewPage() {
         }
     };
 
+    console.log(dayjs().format("DD-MM-YYYY hh:mm a"), 'current date time')
+
     const handlePendingBill = (existingBill) => {
+        const currentDate = dayjs().format("DD-MM-YYYY");
         const newTransaction = {
             amount: Number(receivedAmount),
-            date: dayjs().format("DD-MM-YYYY hh:mm A"),
+            date: currentDate ,
         };
 
         if (existingBill) {
@@ -212,6 +217,7 @@ export default function ReceiptPreviewPage() {
     };
 
     const transactions = existingBill?.transactions || [];
+    console.log(transactions, 'transactions in receipt preview')
     const totalReceived = transactions.reduce((sum, t) => sum + t.amount, 0);
     const balance = displayGrandTotal - totalReceived;
 
@@ -307,29 +313,54 @@ export default function ReceiptPreviewPage() {
                             <table className="w-full text-sm relative z-10 border-t border-b border-gray-300 table-fixed">
                                 <thead className="bg-slate-50">
                                     <tr className="flex border-b w-full">
-                                        <th className="flex-1 text-left py-3 px-2"> </th>
-                                        <th className="w-16 py-3 px-2 hide-column">Action</th>
+                                        <th className="flex-1 text-left py-3 px-2">Received At</th>
                                         <th className="flex-1 text-right py-3 px-2 text-center">Amount</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     {transactions.map((t, idx) => (
-                                        <tr key={idx} className="flex border-b w-full hover:bg-slate-50">
-                                            <td className="flex-1 py-3 px-2">Received</td>
-                                            <td className="flex-1 w-16  py-3 px-2 text-center">
-                                                <button
-                                                    onClick={() => removeTransaction(idx)}
-                                                    className="text-red-500 hide-btn hover:text-red-700 p-1"
-                                                >
-                                                    <Trash2 className="h-4 w-4" />
-                                                </button>
-                                            </td>
+                                        <tr
+                                            key={idx}
+                                            className="flex border-b w-full hover:bg-slate-50 cursor-pointer"
+                                            onClick={() => setSelectedDeleteIndex(idx)}
+                                        >
+                                            <td className="flex-1 py-3 px-2 text-[12px]">{t.date.slice(0,10)}</td>
                                             <td className="flex-1 text-right py-3 px-2 font-semibold text-green-600">₹{t.amount}</td>
-
                                         </tr>
                                     ))}
                                 </tbody>
                             </table>
+                        </div>
+                    )}
+
+                    {selectedDeleteIndex !== null && (
+                        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4 py-6">
+                            <div className="w-full max-w-sm rounded-2xl bg-white p-5 shadow-xl">
+                                <h3 className="text-lg font-semibold text-slate-900">Delete payment?</h3>
+                                <p className="mt-2 text-sm text-slate-600">
+                                    Are you sure you want to delete this payment entry?
+                                </p>
+                                <div className="mt-4 rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                                    <div className="text-sm text-slate-500">Received At</div>
+                                    <div className="font-medium text-slate-900">{transactions[selectedDeleteIndex]?.date}</div>
+                                    <div className="mt-2 text-sm text-slate-500">Amount</div>
+                                    <div className="font-semibold text-green-600">₹{transactions[selectedDeleteIndex]?.amount}</div>
+                                </div>
+                                <div className="mt-5 flex gap-3">
+                                    <button
+                                        onClick={() => setSelectedDeleteIndex(null)}
+                                        className="flex-1 rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm font-medium text-slate-700 hover:bg-slate-100 transition"
+                                    >
+                                        Cancel
+                                    </button>
+                                    <button
+                                        onClick={() => removeTransaction(selectedDeleteIndex)}
+                                        className="flex-1 rounded-xl bg-red-600 px-4 py-3 text-sm font-semibold text-white hover:bg-red-700 transition"
+                                    >
+                                        Delete
+                                    </button>
+                                </div>
+                            </div>
                         </div>
                     )}
 
