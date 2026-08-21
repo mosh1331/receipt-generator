@@ -9,7 +9,6 @@ import {
     updatePendingBill,
 } from "../../../redux/slice/pendingBillsSlice";
 import ItemsTable from "./ItemsTable";
-import ActionButtons from "./ActionButtons";
 import { ArrowLeft, Download, Share2, DollarSign, IndianRupee, X, Trash2 } from "lucide-react";
 
 export default function ReceiptPreviewPage() {
@@ -20,6 +19,9 @@ export default function ReceiptPreviewPage() {
     const [error, setError] = useState(null);
     const [showItems, setShowItems] = useState(true);
     const [selectedDeleteIndex, setSelectedDeleteIndex] = useState(null);
+    const [receivedDate, setReceivedDate] = useState(dayjs().format("YYYY-MM-DD"));
+    const [tempDate, setTempDate] = useState(dayjs().format("YYYY-MM-DD"));
+
     const pendingBills = useSelector((state) => state.pending.list);
     const dispatch = useDispatch();
     const navigate = useNavigate();
@@ -48,15 +50,16 @@ export default function ReceiptPreviewPage() {
     useEffect(() => {
         if (showAmountInput) {
             setTempAmount(receivedAmount);
+            setTempDate(receivedDate || dayjs().format("YYYY-MM-DD"));
         }
-    }, [showAmountInput, receivedAmount]);
+    }, [showAmountInput, receivedAmount, receivedDate]);
 
     // Auto-add payment when receivedAmount is set for existing bills
     useEffect(() => {
         if (receivedAmount > 0 && existingBill) {
             const newTransaction = {
                 amount: Number(receivedAmount),
-                date: dayjs().format("DD-MM-YYYY"),
+                date: dayjs(receivedDate).format("DD-MM-YYYY"), // <-- Updated
             };
             let updatedBill = {
                 ...existingBill,
@@ -72,10 +75,11 @@ export default function ReceiptPreviewPage() {
             } else {
                 dispatch(updatePendingBill(updatedBill));
             }
-            // Reset receivedAmount after adding
+            // Reset receivedAmount & date after adding
             setReceivedAmount(0);
+            setReceivedDate(dayjs().format("YYYY-MM-DD"));
         }
-    }, [receivedAmount, existingBill, dispatch]);
+    }, [receivedAmount, receivedDate, existingBill, dispatch]);
 
     // Remove a transaction from the bill
     const removeTransaction = (index) => {
@@ -107,10 +111,10 @@ export default function ReceiptPreviewPage() {
     console.log(dayjs().format("DD-MM-YYYY hh:mm a"), 'current date time')
 
     const handlePendingBill = (existingBill) => {
-        const currentDate = dayjs().format("DD-MM-YYYY");
+        const formattedReceivedDate = dayjs(receivedDate).format("DD-MM-YYYY");
         const newTransaction = {
             amount: Number(receivedAmount),
-            date: currentDate ,
+            date: formattedReceivedDate, // <-- Updated
         };
 
         if (existingBill) {
@@ -174,7 +178,7 @@ export default function ReceiptPreviewPage() {
                         const hideColumn = clonedDoc.querySelector('.hide-column');
                         const hideButtons = clonedDoc.querySelectorAll('.hide-btn');
                         if (checkBox) checkBox.style.display = 'none';
-                        if(hideColumn) hideColumn.style.display = 'none';
+                        if (hideColumn) hideColumn.style.display = 'none';
                         hideButtons.forEach(btn => btn.style.display = 'none');
                         if (scrollableBody) {
                             scrollableBody.style.height = 'auto';
@@ -324,7 +328,7 @@ export default function ReceiptPreviewPage() {
                                             className="flex border-b w-full hover:bg-slate-50 cursor-pointer"
                                             onClick={() => setSelectedDeleteIndex(idx)}
                                         >
-                                            <td className="flex-1 py-3 px-2 text-[12px]">{t.date.slice(0,10)}</td>
+                                            <td className="flex-1 py-3 px-2 text-[12px]">{t.date.slice(0, 10)}</td>
                                             <td className="flex-1 text-right py-3 px-2 font-semibold text-green-600">₹{t.amount}</td>
                                         </tr>
                                     ))}
@@ -369,7 +373,7 @@ export default function ReceiptPreviewPage() {
                         <div className="bg-slate-50 rounded-xl p-4">
                             <table className="w-full text-sm">
                                 <tbody className="divide-y divide-slate-200">
-                                     <tr className="py-2">
+                                    <tr className="py-2">
                                         <td className="py-3 font-medium text-slate-700">Total Bill</td>
                                         <td className="text-right font-semibold  py-3">₹{Number(grandTotal)}</td>
                                     </tr>
@@ -416,6 +420,7 @@ export default function ReceiptPreviewPage() {
                 </div> */}
 
                 {/* Add Payment Input Modal */}
+                {/* Add Payment Input Modal */}
                 {showAmountInput && (
                     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
                         <div className="bg-white rounded-xl shadow-lg p-6 w-full max-w-md">
@@ -424,7 +429,25 @@ export default function ReceiptPreviewPage() {
                                     <DollarSign className="h-5 w-5 text-slate-600" />
                                     <h3 className="text-lg font-semibold text-slate-900">Add Payment</h3>
                                 </div>
-                                <div className="relative">
+
+                                {/* Date Selector */}
+                                <div>
+                                    <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">
+                                        Payment Date
+                                    </label>
+                                    <input
+                                        type="date"
+                                        value={tempDate}
+                                        onChange={(e) => setTempDate(e.target.value)}
+                                        className="w-full border border-slate-300 rounded-lg px-4 py-2.5 text-base text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                    />
+                                </div>
+
+                                {/* Amount Input */}
+                                <div>
+                                    <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">
+                                        Amount Received
+                                    </label>
                                     <input
                                         type="number"
                                         value={tempAmount}
@@ -433,7 +456,8 @@ export default function ReceiptPreviewPage() {
                                         className="w-full border border-slate-300 rounded-lg px-4 py-3 text-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                     />
                                 </div>
-                                <div className="flex gap-3">
+
+                                <div className="flex gap-3 pt-2">
                                     <button
                                         onClick={() => setShowAmountInput(false)}
                                         className="flex-1 px-4 py-2 bg-slate-100 text-slate-700 rounded-lg hover:bg-slate-200 transition-colors"
@@ -443,6 +467,7 @@ export default function ReceiptPreviewPage() {
                                     <button
                                         onClick={() => {
                                             setReceivedAmount(Number(tempAmount));
+                                            setReceivedDate(tempDate); // <-- Save selected date
                                             setShowAmountInput(false);
                                         }}
                                         className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
